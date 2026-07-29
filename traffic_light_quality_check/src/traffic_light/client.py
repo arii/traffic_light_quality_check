@@ -119,22 +119,32 @@ class ScaleClient:
              import base64
              auth_str = f"{self.api_key}:"
              b64_auth = base64.b64encode(auth_str.encode('utf-8')).decode('utf-8')
-             
+
              # Scale API uses 'project' for project name and 'project_id' for project hex ID.
              # A 24-character hex string indicates a project_id.
              is_hex_id = len(project_id) == 24 and all(c in "0123456789abcdefABCDEF" for c in project_id)
              param_key = "project_id" if is_hex_id else "project"
-             
-             url = f"{self.base_url}/tasks?{param_key}={urllib.parse.quote(project_id)}"
-             req = urllib.request.Request(url)
-             req.add_header("Authorization", f"Basic {b64_auth}")
-             req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+
+             all_tasks = []
+             next_token = None
              try:
-                 with urllib.request.urlopen(req) as response:
-                     data = json.loads(response.read().decode('utf-8'))
-                     return data.get("docs", [])
+                 while True:
+                     url = f"{self.base_url}/tasks?{param_key}={urllib.parse.quote(project_id)}&limit=100"
+                     if next_token:
+                         url += f"&next_token={urllib.parse.quote(next_token)}"
+                     req = urllib.request.Request(url)
+                     req.add_header("Authorization", f"Basic {b64_auth}")
+                     req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                     with urllib.request.urlopen(req) as response:
+                         data = json.loads(response.read().decode('utf-8'))
+                     all_tasks.extend(data.get("docs", []))
+                     if data.get("has_more") and data.get("next_token"):
+                         next_token = data["next_token"]
+                     else:
+                         break
              except urllib.error.URLError as e:
                  logging.error(f"Error fetching from Scale API: {e}")
-                 return []
+             return all_tasks
         else:
              return []
+

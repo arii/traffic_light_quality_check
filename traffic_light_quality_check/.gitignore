@@ -1,1 +1,7 @@
 output.json
+.env
+test_out.json
+test_report.html
+tasks_snapshot.json
+*.png
+*.jpg
