@@ -1,16 +1,11 @@
 import json
 import logging
-import urllib.request
-import urllib.error
-import urllib.parse
+import requests
 import os
 from typing import List, Dict, Any
 from PIL import Image
 
 from .models import Task, Annotation, BoundingBox
-
-DEFAULT_IMAGE_WIDTH = 2000
-DEFAULT_IMAGE_HEIGHT = 2000
 
 
 def get_image_size(url: str) -> tuple[int, int] | None:
@@ -18,10 +13,10 @@ def get_image_size(url: str) -> tuple[int, int] | None:
     if not url:
         return None
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=5) as response:
-            with Image.open(response) as img:
-                return img.size  # returns (width, height)
+        response = requests.get(url, stream=True, headers={"User-Agent": "Mozilla/5.0"}, timeout=5)
+        response.raise_for_status()
+        with Image.open(response.raw) as img:
+            return img.size  # returns (width, height)
     except Exception as e:
         logging.warning(f"Failed to fetch image dimensions from {url}: {e}")
         return None
@@ -116,18 +111,19 @@ class ScaleClient:
         elif project_id:
              if not self.api_key:
                  raise ValueError("SCALE_API_KEY environment variable or api_key argument is required when fetching by project_id")
-             import base64
-             auth_str = f"{self.api_key}:"
-             b64_auth = base64.b64encode(auth_str.encode('utf-8')).decode('utf-8')
-             url = f"{self.base_url}/tasks?project={urllib.parse.quote(project_id)}"
-             req = urllib.request.Request(url)
-             req.add_header("Authorization", f"Basic {b64_auth}")
-             req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+             url = f"{self.base_url}/tasks"
+             params = {"project": project_id}
              try:
-                 with urllib.request.urlopen(req) as response:
-                     data = json.loads(response.read().decode('utf-8'))
-                     return data.get("docs", [])
-             except urllib.error.URLError as e:
+                 response = requests.get(
+                     url,
+                     params=params,
+                     auth=(self.api_key, ""),
+                     headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+                 )
+                 response.raise_for_status()
+                 data = response.json()
+                 return data.get("docs", [])
+             except requests.exceptions.RequestException as e:
                  logging.error(f"Error fetching from Scale API: {e}")
                  return []
         else:

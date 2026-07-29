@@ -1,26 +1,93 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Set, Dict
 
-from .models import Task, Finding, Annotation
-from . import geometry
+from .models import Task, Finding, Annotation, BoundingBox
 
-@dataclass(frozen=True)
+
+def box_area(box: BoundingBox) -> float:
+    """Returns the area of the bounding box."""
+    return box.width * box.height
+
+def box_area_ratio(box: BoundingBox, image_width: int, image_height: int) -> float:
+    """Returns the ratio of the box area to the image area."""
+    area = box_area(box)
+    image_area = image_width * image_height
+    if image_area == 0:
+        return 0.0
+    return area / image_area
+
+def intersection_area(first: BoundingBox, second: BoundingBox) -> float:
+    """Returns the intersection area of two bounding boxes."""
+    x_left = max(first.left, second.left)
+    y_top = max(first.top, second.top)
+    x_right = min(first.left + first.width, second.left + second.width)
+    y_bottom = min(first.top + first.height, second.top + second.height)
+
+    if x_right < x_left or y_bottom < y_top:
+        return 0.0
+
+    return (x_right - x_left) * (y_bottom - y_top)
+
+def intersection_over_union(first: BoundingBox, second: BoundingBox) -> float:
+    """Returns the Intersection-over-Union (IoU) of two bounding boxes."""
+    inter = intersection_area(first, second)
+    if inter == 0.0:
+        return 0.0
+
+    area_first = box_area(first)
+    area_second = box_area(second)
+
+    union = area_first + area_second - inter
+    if union <= 0.0:
+        return 0.0
+    return inter / union
+
+def containment_ratio(inner: BoundingBox, outer: BoundingBox) -> float:
+    """Returns what portion of the inner box is contained within the outer box."""
+    inter = intersection_area(inner, outer)
+    area_inner = box_area(inner)
+    if area_inner == 0.0:
+        return 0.0
+    return inter / area_inner
+
+def is_degenerate(box: BoundingBox) -> bool:
+    """Returns True if the bounding box has zero width or height."""
+    return box.width <= 0.0 or box.height <= 0.0
+
+def is_out_of_bounds(box: BoundingBox, image_width: int, image_height: int) -> bool:
+    """Returns True if the box is outside the image boundary."""
+    if box.left < 0 or box.top < 0:
+        return True
+    if box.left + box.width > image_width:
+        return True
+    if box.top + box.height > image_height:
+        return True
+    return False
+
+def aspect_ratio(box: BoundingBox) -> float:
+    """Returns the aspect ratio (width / height) of the box."""
+    if box.height == 0:
+        return 0.0
+    return box.width / box.height
+
+
+@dataclass
 class QualityConfig:
-    valid_labels: frozenset[str] = frozenset({
+    valid_labels: set[str] = field(default_factory=lambda: {
         "traffic_control_sign",
         "construction_sign",
         "information_sign",
         "policy_sign",
         "non_visible_face"
     })
-    valid_attributes: frozenset[str] = frozenset({
+    valid_attributes: set[str] = field(default_factory=lambda: {
         "occlusion",
         "truncation",
         "background_color"
     })
-    valid_occlusion: frozenset[str] = frozenset({"0%", "25%", "50%", "75%", "100%"})
-    valid_truncation: frozenset[str] = frozenset({"0%", "25%", "50%", "75%", "100%"})
-    valid_background: frozenset[str] = frozenset({
+    valid_occlusion: set[str] = field(default_factory=lambda: {"0%", "25%", "50%", "75%", "100%"})
+    valid_truncation: set[str] = field(default_factory=lambda: {"0%", "25%", "50%", "75%", "100%"})
+    valid_background: set[str] = field(default_factory=lambda: {
         "white", "red", "orange", "yellow", "green", "blue", "other", "not_applicable"
     })
 
@@ -134,7 +201,7 @@ def check_out_of_bounds(task: Task, config: QualityConfig) -> List[Finding]:
     if task.image_width is None or task.image_height is None:
         return findings
     for ann in task.annotations:
-        if geometry.is_out_of_bounds(ann.box, task.image_width, task.image_height):
+        if is_out_of_bounds(ann.box, task.image_width, task.image_height):
             findings.append(Finding(
                 rule_id="GEO-001",
                 severity="error",
@@ -153,7 +220,7 @@ def check_out_of_bounds(task: Task, config: QualityConfig) -> List[Finding]:
 def check_degenerate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
-        if geometry.is_degenerate(ann.box):
+        if is_degenerate(ann.box):
             findings.append(Finding(
                 rule_id="GEO-005",
                 severity="error",
@@ -169,9 +236,9 @@ def check_degenerate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
 def check_micro_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
-        if geometry.is_degenerate(ann.box):
+        if is_degenerate(ann.box):
             continue
-        area = geometry.box_area(ann.box)
+        area = box_area(ann.box)
         if ann.box.width < config.micro_box_width or \
            ann.box.height < config.micro_box_height or \
            area < config.micro_box_area:
@@ -192,7 +259,7 @@ def check_giant_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     if task.image_width is None or task.image_height is None:
         return findings
     for ann in task.annotations:
-        ratio = geometry.box_area_ratio(ann.box, task.image_width, task.image_height)
+        ratio = box_area_ratio(ann.box, task.image_width, task.image_height)
         if ratio > config.giant_box_area_ratio:
             findings.append(Finding(
                 rule_id="GEO-003",
@@ -209,9 +276,9 @@ def check_giant_boxes(task: Task, config: QualityConfig) -> List[Finding]:
 def check_extreme_aspect_ratio(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
-        if geometry.is_degenerate(ann.box):
+        if is_degenerate(ann.box):
             continue
-        ratio = geometry.aspect_ratio(ann.box)
+        ratio = aspect_ratio(ann.box)
         if ratio > config.extreme_aspect_ratio_max or ratio < config.extreme_aspect_ratio_min:
             findings.append(Finding(
                 rule_id="GEO-004",
@@ -231,7 +298,7 @@ def check_duplicate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
         for j in range(i + 1, len(task.annotations)):
             ann1 = task.annotations[i]
             ann2 = task.annotations[j]
-            iou = geometry.intersection_over_union(ann1.box, ann2.box)
+            iou = intersection_over_union(ann1.box, ann2.box)
             if iou > config.duplicate_iou:
                 findings.append(Finding(
                     rule_id="OVL-001",
@@ -253,9 +320,9 @@ def check_suspicious_containment(task: Task, config: QualityConfig) -> List[Find
                 continue
             inner = task.annotations[i]
             outer = task.annotations[j]
-            containment = geometry.containment_ratio(inner.box, outer.box)
+            containment = containment_ratio(inner.box, outer.box)
             # Check if inner is fully contained in outer, but not a duplicate (IoU might be small)
-            iou = geometry.intersection_over_union(inner.box, outer.box)
+            iou = intersection_over_union(inner.box, outer.box)
             if containment > config.suspicious_containment_ratio and iou < config.duplicate_iou:
                 findings.append(Finding(
                     rule_id="OVL-002",
@@ -280,3 +347,22 @@ RULES = [
     check_duplicate_boxes,
     check_suspicious_containment,
 ]
+
+
+def audit_task(task: Task, config: QualityConfig = None) -> list[Finding]:
+    """Runs all rules on a single task and returns findings."""
+    if config is None:
+        config = QualityConfig()
+
+    findings = []
+    for rule in RULES:
+        findings.extend(rule(task, config))
+
+    return findings
+
+def audit_tasks(tasks: list[Task], config: QualityConfig = None) -> dict[str, list[Finding]]:
+    """Runs all rules on a list of tasks and groups findings by task_id."""
+    return {
+        task.id: audit_task(task, config)
+        for task in tasks
+    }

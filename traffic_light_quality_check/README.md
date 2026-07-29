@@ -97,10 +97,8 @@ The audit results below are scoped specifically to the **Traffic Sign Detection*
 
 ## 5. Reflection: Future Roadmap
 
-If given more time to scale this checker for production workloads (e.g. 250,000 tasks):
+If given more time to scale this checker for production workloads:
 
-1. **Cross-Task Consensus Checks:** Implement perceptual image hashing to automatically identify duplicate images labeled by different annotators and flag discrepancies in labeling.
-2. **Dominant Color Verification:** Add cropping pipelines to extract sign or traffic light bounding box regions and programmatically verify that the labeled color attribute matches actual pixel colors (e.g., green/red lights).
-3. **Targeted & Global OCR Auditing:** Integrate OCR to read cropped sign text (e.g., matching speed limit values against labels) and scan the global canvas to flag text (e.g. "STOP" signs) that does not have a bounding box annotation.
-4. **Proactive Project Fingerprint Checks:** Generalize the project scope safeguard by checking a queried project's schemas against a fingerprint registry, generating a diagnostic alert if labels look mismatched before running geometry logic.
-5. **Asynchronous Processing:** Re-architect client fetches and dimensions lookups to utilize an asynchronous task generator (e.g., `aiohttp`), ensuring concurrent audits don't hit network or memory execution bottlenecks.
+1. **Adding validation schema files:** Allow custom taxonomy overrides without changing code.
+2. **Proactive Project Fingerprint Checks:** Generalize the project scope safeguard by checking a queried project's schemas against a fingerprint registry, generating a diagnostic alert if labels look mismatched before running geometry logic.
+3. **Asynchronous Processing:** Re-architect client fetches and dimensions lookups to utilize an asynchronous task generator (e.g., `aiohttp`), ensuring concurrent audits don't hit network or memory execution bottlenecks.
