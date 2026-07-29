@@ -59,12 +59,18 @@ def normalize_task(raw_task: Dict[str, Any]) -> Task:
 
 class ScaleClient:
     def __init__(self, api_key: str = None):
+        # Try loading .env automatically
+        try:
+            import dotenv
+            dotenv.load_dotenv()
+        except ImportError:
+            pass
         self.api_key = api_key or os.environ.get("SCALE_API_KEY", "")
         self.base_url = "https://api.scale.com/v1"
 
     def get_tasks(self, project_id: str = None, file_path: str = None) -> List[Dict[str, Any]]:
         """
-        Fetches tasks from a file (if file_path is provided) or from Scale API (not fully implemented).
+        Fetches tasks from a file (if file_path is provided) or from Scale API.
         """
         if file_path:
             with open(file_path, "r", encoding="utf-8") as f:
@@ -77,12 +83,13 @@ class ScaleClient:
                     return data["tasks"]
                 return [data]
         elif project_id:
-             # Basic implementation that could connect to scale
              import base64
              auth_str = f"{self.api_key}:"
              b64_auth = base64.b64encode(auth_str.encode('utf-8')).decode('utf-8')
              url = f"{self.base_url}/tasks?project={urllib.parse.quote(project_id)}"
-             req = urllib.request.Request(url, headers={"Authorization": f"Basic {b64_auth}"})
+             req = urllib.request.Request(url)
+             req.add_header("Authorization", f"Basic {b64_auth}")
+             req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
              try:
                  with urllib.request.urlopen(req) as response:
                      data = json.loads(response.read().decode('utf-8'))

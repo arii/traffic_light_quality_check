@@ -1,0 +1,150 @@
+[
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "TAX-001",
+    "severity": "error",
+    "category": "taxonomy",
+    "annotation_id": "7cfa0418-4a5f-4cdd-90d7-3cdd36d3899f",
+    "message": "Invalid label 'Traffic Lights'.",
+    "evidence": {
+      "label": "Traffic Lights"
+    }
+  },
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "TAX-001",
+    "severity": "error",
+    "category": "taxonomy",
+    "annotation_id": "fc38c00f-f048-4bd8-ad02-b48031f5e9c0",
+    "message": "Invalid label 'Traffic Lights'.",
+    "evidence": {
+      "label": "Traffic Lights"
+    }
+  },
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "TAX-001",
+    "severity": "error",
+    "category": "taxonomy",
+    "annotation_id": "05229ec2-cbcf-41e8-b9ec-21e7d9988b17",
+    "message": "Invalid label 'Traffic Lights'.",
+    "evidence": {
+      "label": "Traffic Lights"
+    }
+  },
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "TAX-001",
+    "severity": "error",
+    "category": "taxonomy",
+    "annotation_id": "05423c58-78e0-4520-9879-e33032b1c8fa",
+    "message": "Invalid label 'Traffic Lights'.",
+    "evidence": {
+      "label": "Traffic Lights"
+    }
+  },
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "TAX-002",
+    "severity": "error",
+    "category": "taxonomy",
+    "annotation_id": "7cfa0418-4a5f-4cdd-90d7-3cdd36d3899f",
+    "message": "Invalid attribute key 'traffic_light_color'.",
+    "evidence": {
+      "attribute": "traffic_light_color"
+    }
+  },
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "TAX-002",
+    "severity": "error",
+    "category": "taxonomy",
+    "annotation_id": "fc38c00f-f048-4bd8-ad02-b48031f5e9c0",
+    "message": "Invalid attribute key 'traffic_light_color'.",
+    "evidence": {
+      "attribute": "traffic_light_color"
+    }
+  },
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "TAX-002",
+    "severity": "error",
+    "category": "taxonomy",
+    "annotation_id": "05229ec2-cbcf-41e8-b9ec-21e7d9988b17",
+    "message": "Invalid attribute key 'traffic_light_color'.",
+    "evidence": {
+      "attribute": "traffic_light_color"
+    }
+  },
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "TAX-002",
+    "severity": "error",
+    "category": "taxonomy",
+    "annotation_id": "05423c58-78e0-4520-9879-e33032b1c8fa",
+    "message": "Invalid attribute key 'traffic_light_color'.",
+    "evidence": {
+      "attribute": "traffic_light_color"
+    }
+  },
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "GEO-001",
+    "severity": "error",
+    "category": "geometry",
+    "annotation_id": "fc38c00f-f048-4bd8-ad02-b48031f5e9c0",
+    "message": "Bounding box is out of image bounds or touches the edges.",
+    "evidence": {
+      "box": {
+        "left": 1927.0,
+        "top": 919.0,
+        "width": 102.0,
+        "height": 254.0
+      },
+      "image_size": {
+        "width": 2000,
+        "height": 2000
+      }
+    }
+  },
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "GEO-001",
+    "severity": "error",
+    "category": "geometry",
+    "annotation_id": "05229ec2-cbcf-41e8-b9ec-21e7d9988b17",
+    "message": "Bounding box is out of image bounds or touches the edges.",
+    "evidence": {
+      "box": {
+        "left": 2976.0,
+        "top": 1275.0,
+        "width": 146.0,
+        "height": 245.0
+      },
+      "image_size": {
+        "width": 2000,
+        "height": 2000
+      }
+    }
+  },
+  {
+    "task_id": "6250ca4a1d7df5002cdb8840",
+    "rule_id": "GEO-001",
+    "severity": "error",
+    "category": "geometry",
+    "annotation_id": "05423c58-78e0-4520-9879-e33032b1c8fa",
+    "message": "Bounding box is out of image bounds or touches the edges.",
+    "evidence": {
+      "box": {
+        "left": 2868.0,
+        "top": 1304.0,
+        "width": 105.0,
+        "height": 251.0
+      },
+      "image_size": {
+        "width": 2000,
+        "height": 2000
+      }
+    }
+  }
+]
