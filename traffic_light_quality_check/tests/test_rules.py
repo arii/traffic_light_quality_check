@@ -53,8 +53,10 @@ def test_duplicate_boxes():
     ann2 = Annotation(id="2", label="traffic_control_sign", box=BoundingBox(11, 11, 49, 49), attributes={})
     task = Task(id="t1", image_url="", image_width=1000, image_height=1000, annotations=[ann1, ann2])
     findings = check_duplicate_boxes(task, config)
-    assert len(findings) == 2  # One for each annotation
+    assert len(findings) == 1  # Only one consolidated finding
     assert findings[0].rule_id == "OVL-001"
+    assert findings[0].annotation_id == "1"
+    assert findings[0].evidence["other_annotation_id"] == "2"
 
 def test_suspicious_containment():
     ann_outer = Annotation(id="1", label="traffic_control_sign", box=BoundingBox(10, 10, 100, 100), attributes={})
