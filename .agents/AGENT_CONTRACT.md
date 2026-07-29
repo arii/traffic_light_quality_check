@@ -11,6 +11,9 @@ Read the matching workflow before starting these task types:
 ---
 
 ## What You Will Always Do
+- Rebase your branch onto `origin/main` before starting work or submitting changes.
+- Update the `README.md` if your changes alter behavior, configuration, or CLI instructions.
+- Ensure all linting checks are passing before considering work complete.
 
 - Read all referenced files before taking any action.
 - **Prioritize Index & Schema**: Always consult `.agent-context.json` for
