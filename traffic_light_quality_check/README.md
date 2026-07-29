@@ -6,7 +6,7 @@
 ### 1. Approach & Scoping Safekeeping
 - **Visual Problem Exploration:** I started with a web-based visualizer tool to overlay annotations directly onto S3 images. This helped map constraints visually and identify that the database dump contained a mixture of legacy traffic light tasks, retail/invoice linter data, and current target traffic sign tasks.
 - **Scoping Safeguard:** Parameterizing the CLI with `--project-id 5f124e5671c7b700170a16fb` isolates the checker to only validate the 8 target *Traffic Sign Detection* tasks, preventing legacy project schemas from contaminating the results.
-- **Agentic Orchestration:** Designed a task-specification layout (`plan.md`) to guide the module boundaries, then leveraged autonomous agent workflows to update and implement the checker files.
+- **Agentic Orchestration:** I drafted a comprehensive task-specification layout (`plan.md`) to guide the module boundaries and system architecture, then directed autonomous agent coding tools to implement the helper files and checker modules under my direct supervision.
 - **Verification Loop:** Verifying check outputs inside the visualizer exposed key anomalies, such as undetected false-positive empty bounding boxes in night-time images (e.g. task `5f127f699740b80017f9b170`).
 
 ### 2. Overview
@@ -59,7 +59,7 @@ The audit was executed against the **Traffic Sign Detection** project tasks:
 | `5f127f6f26831d0010e985e5` | 0 findings | `Traffic Sign Detection` | **Clean:** Bounding box coordinates and attributes match the target taxonomy. |
 | `5f127f6c3a6b1000172320ad` | 0 findings | `Traffic Sign Detection` | **Clean:** Bounding box coordinates and attributes match the target taxonomy. |
 | `5f127f699740b80017f9b170` | 0 findings | `Traffic Sign Detection` | **Clean (Visual False Positives Present):** Passed all geometric/taxonomic rules, but visual inspection reveals empty bounding boxes placed in pitch-black areas of the night image. |
-| `5f127f671ab28b001762c204` | 19 findings | `Traffic Sign Detection` | **Severe Overlaps:** 15 severe `OVL-001` duplicate annotation errors (IoU > 0.98) on stop signs; 4 `OVL-002` containment flags. Density is due to 6 duplicate annotations overlaid on the same sign region. |
+| `5f127f671ab28b001762c204` | 19 findings | `Traffic Sign Detection` | **Severe Overlaps:** 15 severe `OVL-001` duplicate annotation errors (triggered our IoU > 0.90 threshold, reaching up to 0.98) on stop signs; 4 `OVL-002` containment flags. Density is due to 6 duplicate annotations overlaid on the same sign region. |
 | `5f127f643a6b1000172320a5` | 0 findings | `Traffic Sign Detection` | **Clean:** Bounding box coordinates and attributes match the target taxonomy. |
 | `5f127f5f3a6b100017232099` | 2 findings | `Traffic Sign Detection` | **Warnings:** 2 `OVL-002` suspicious containment flags (bounding box nested within another). |
 | `5f127f5ab1cb1300109e4ffc` | 0 findings | `Traffic Sign Detection` | **Clean:** Bounding box coordinates and attributes match the target taxonomy. |
