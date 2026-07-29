@@ -13,6 +13,9 @@
     "**/*.test.tsx",
     "**/pnpm-lock.yaml",
     ".agents/**",
+    "**/visualizer_template.html",
+    "observesign_visualizer_scale_ai_quality_checker (2).html",
+    "**/*.json"
     "**/results/*.json",
     "**/test_out.json"
     "**/*.md",

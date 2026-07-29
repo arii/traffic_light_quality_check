@@ -99,6 +99,8 @@ def check_invalid_attributes(task: Task, config: QualityConfig) -> list[Finding]
 
 def check_out_of_bounds(task: Task, config: QualityConfig) -> list[Finding]:
     findings = []
+    if task.image_width is None or task.image_height is None:
+        return findings
     for ann in task.annotations:
         if geometry.is_out_of_bounds(ann.box, task.image_width, task.image_height):
             findings.append(Finding(
@@ -137,6 +139,8 @@ def check_micro_boxes(task: Task, config: QualityConfig) -> list[Finding]:
 
 def check_giant_boxes(task: Task, config: QualityConfig) -> list[Finding]:
     findings = []
+    if task.image_width is None or task.image_height is None:
+        return findings
     for ann in task.annotations:
         ratio = geometry.box_area_ratio(ann.box, task.image_width, task.image_height)
         if ratio > config.giant_box_area_ratio:
@@ -185,15 +189,6 @@ def check_duplicate_boxes(task: Task, config: QualityConfig) -> list[Finding]:
                     task_id=task.id,
                     annotation_id=ann1.id,
                     evidence={"iou": iou, "other_annotation_id": ann2.id}
-                ))
-                findings.append(Finding(
-                    rule_id="OVL-001",
-                    severity="error",
-                    category="overlap",
-                    message="Annotations are duplicates or near-duplicates.",
-                    task_id=task.id,
-                    annotation_id=ann2.id,
-                    evidence={"iou": iou, "other_annotation_id": ann1.id}
                 ))
     return findings
 

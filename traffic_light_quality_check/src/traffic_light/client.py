@@ -5,11 +5,26 @@ import urllib.error
 import urllib.parse
 import os
 from typing import List, Dict, Any
+from PIL import Image
 
 from .models import Task, Annotation, BoundingBox
 
 DEFAULT_IMAGE_WIDTH = 2000
 DEFAULT_IMAGE_HEIGHT = 2000
+
+
+def get_image_size(url: str) -> tuple[int, int] | None:
+    """Streams only the header bytes necessary to parse image dimensions using Pillow."""
+    if not url:
+        return None
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            with Image.open(response) as img:
+                return img.size  # returns (width, height)
+    except Exception as e:
+        logging.warning(f"Failed to fetch image dimensions from {url}: {e}")
+        return None
 
 
 def normalize_task(raw_task: Dict[str, Any]) -> Task:
@@ -21,13 +36,18 @@ def normalize_task(raw_task: Dict[str, Any]) -> Task:
     if "attachment" in params:
          image_url = params["attachment"]
 
-    # Often, image dimensions aren't provided in the scale API directly in the root,
-    # let's assume default large size for safety if not present, or try to infer.
-    # In some real-world data, they are provided inside params or metadata.
-    # We will set a default large dimension to prevent division by zero, and allow out-of-bounds to just test zero bound.
-    # For a real integration, we might need to fetch the image and get size.
-    image_width = params.get("image_width", DEFAULT_IMAGE_WIDTH)
-    image_height = params.get("image_height", DEFAULT_IMAGE_HEIGHT)
+    image_width = params.get("image_width")
+    image_height = params.get("image_height")
+
+    if (image_width is None or image_height is None) and image_url:
+        size = get_image_size(image_url)
+        if size:
+            image_width, image_height = size
+
+    if image_width is None or image_height is None:
+        logging.warning(
+            f"Task {task_id} is missing image dimensions. Skipping ratio-based validation checks."
+        )
 
     annotations = []
 

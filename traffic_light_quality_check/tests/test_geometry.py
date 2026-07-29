@@ -45,6 +45,18 @@ def test_is_out_of_bounds():
     box_out_left = BoundingBox(-1, 5, 10, 10)
     box_out_right = BoundingBox(95, 5, 10, 10) # 95 + 10 = 105 > 100
     box_in = BoundingBox(5, 5, 10, 10)
+
+    # Touch boundary cases
+    box_touch_left = BoundingBox(0, 5, 10, 10)
+    box_touch_top = BoundingBox(5, 0, 10, 10)
+    box_touch_right = BoundingBox(90, 5, 10, 10) # 90 + 10 = 100
+    box_touch_bottom = BoundingBox(5, 90, 10, 10) # 90 + 10 = 100
+
     assert is_out_of_bounds(box_out_left, 100, 100) == True
     assert is_out_of_bounds(box_out_right, 100, 100) == True
     assert is_out_of_bounds(box_in, 100, 100) == False
+
+    assert is_out_of_bounds(box_touch_left, 100, 100) == False
+    assert is_out_of_bounds(box_touch_top, 100, 100) == False
+    assert is_out_of_bounds(box_touch_right, 100, 100) == False
+    assert is_out_of_bounds(box_touch_bottom, 100, 100) == False

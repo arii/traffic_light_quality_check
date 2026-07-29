@@ -21,8 +21,8 @@ class Annotation:
 class Task:
     id: str
     image_url: str
-    image_width: int
-    image_height: int
+    image_width: int | None
+    image_height: int | None
     annotations: List[Annotation]
 
 
