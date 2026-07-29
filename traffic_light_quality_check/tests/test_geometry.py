@@ -24,6 +24,18 @@ def test_intersection_over_union_identical():
     box2 = BoundingBox(0, 0, 10, 10)
     assert intersection_over_union(box1, box2) == 1.0
 
+def test_intersection_over_union_degenerate_boxes():
+    # Box with negative size/degenerate dimensions where union could be <= 0.0
+    box1 = BoundingBox(0, 0, -10, 10)
+    box2 = BoundingBox(0, 0, 10, -10)
+    # intersection_over_union should safely return 0.0 and guard against ZeroDivisionError
+    assert intersection_over_union(box1, box2) == 0.0
+
+    # Box with zero width/height
+    box3 = BoundingBox(0, 0, 0, 0)
+    box4 = BoundingBox(0, 0, 0, 0)
+    assert intersection_over_union(box3, box4) == 0.0
+
 def test_containment_ratio():
     inner = BoundingBox(2, 2, 5, 5)
     outer = BoundingBox(0, 0, 10, 10)

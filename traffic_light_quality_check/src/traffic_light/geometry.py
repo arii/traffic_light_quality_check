@@ -34,7 +34,7 @@ def intersection_over_union(first: BoundingBox, second: BoundingBox) -> float:
     area_second = box_area(second)
 
     union = area_first + area_second - inter
-    if union == 0.0:
+    if union <= 0.0:
         return 0.0
     return inter / union
 
