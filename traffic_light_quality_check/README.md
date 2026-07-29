@@ -4,9 +4,9 @@
 ---
 
 ### 1. Approach & Scoping Safekeeping
-- **Visual Problem Exploration:** Created a web-based visualizer tool to overlay annotations directly onto S3 images. This helped map constraints visually and identify that the database dump contained a mixture of legacy traffic light tasks, retail/invoice linter data, and current target traffic sign tasks.
+- **Visual Problem Exploration:** I started with a web-based visualizer tool to overlay annotations directly onto S3 images. This helped map constraints visually and identify that the database dump contained a mixture of legacy traffic light tasks, retail/invoice linter data, and current target traffic sign tasks.
 - **Scoping Safeguard:** Parameterizing the CLI with `--project-id 5f124e5671c7b700170a16fb` isolates the checker to only validate the 8 target *Traffic Sign Detection* tasks, preventing legacy project schemas from contaminating the results.
-- **Taxonomy Transition Handling:** For legacy projects, the engine maps deprecated attributes (`traffic_light_status`) and labels (`Traffic lights`) as low-severity `warning` flags rather than errors, keeping validation functional across the shared account.
+- **Agentic Orchestration:** Designed a task-specification layout (`plan.md`) to guide the module boundaries, then leveraged autonomous agent workflows to update and implement the checker files.
 - **Verification Loop:** Verifying check outputs inside the visualizer exposed key anomalies, such as undetected false-positive empty bounding boxes in night-time images (e.g. task `5f127f699740b80017f9b170`).
 
 ### 2. Overview
