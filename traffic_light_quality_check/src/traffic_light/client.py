@@ -1,34 +1,12 @@
 import json
 import logging
-import urllib.request
-import urllib.error
-import urllib.parse
 import os
 from typing import List, Dict, Any
-from PIL import Image
+import requests
 
 from .models import Task, Annotation, BoundingBox
 
-DEFAULT_IMAGE_WIDTH = 2000
-DEFAULT_IMAGE_HEIGHT = 2000
-
-
-def get_image_size(url: str) -> tuple[int, int] | None:
-    """Streams only the header bytes necessary to parse image dimensions using Pillow."""
-    if not url:
-        return None
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=5) as response:
-            with Image.open(response) as img:
-                return img.size  # returns (width, height)
-    except Exception as e:
-        logging.warning(f"Failed to fetch image dimensions from {url}: {e}")
-        return None
-
-
 def normalize_task(raw_task: Dict[str, Any]) -> Task:
-    """Converts a raw Scale API task dictionary into the internal Task model."""
     task_id = raw_task.get("task_id", raw_task.get("_id", "unknown"))
 
     image_url = ""
@@ -38,11 +16,6 @@ def normalize_task(raw_task: Dict[str, Any]) -> Task:
 
     image_width = params.get("image_width")
     image_height = params.get("image_height")
-
-    if (image_width is None or image_height is None) and image_url:
-        size = get_image_size(image_url)
-        if size:
-            image_width, image_height = size
 
     if image_width is None or image_height is None:
         logging.warning(
@@ -94,9 +67,6 @@ class ScaleClient:
         self.base_url = "https://api.scale.com/v1"
 
     def get_tasks(self, project_id: str = None, file_path: str = None) -> List[Dict[str, Any]]:
-        """
-        Fetches tasks from a file (if file_path is provided) or from Scale API.
-        """
         if file_path:
             with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
@@ -108,21 +78,18 @@ class ScaleClient:
                     return data["tasks"]
                 raise ValueError("Invalid file format. Expected a list of tasks or a dict with 'docs' or 'tasks' keys.")
         elif project_id:
-             if not self.api_key:
-                 raise ValueError("SCALE_API_KEY environment variable or api_key argument is required when fetching by project_id")
-             import base64
-             auth_str = f"{self.api_key}:"
-             b64_auth = base64.b64encode(auth_str.encode('utf-8')).decode('utf-8')
-             url = f"{self.base_url}/tasks?project={urllib.parse.quote(project_id)}"
-             req = urllib.request.Request(url)
-             req.add_header("Authorization", f"Basic {b64_auth}")
-             req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-             try:
-                 with urllib.request.urlopen(req) as response:
-                     data = json.loads(response.read().decode('utf-8'))
-                     return data.get("docs", [])
-             except urllib.error.URLError as e:
-                 logging.error(f"Error fetching from Scale API: {e}")
-                 return []
+            if not self.api_key:
+                raise ValueError("SCALE_API_KEY environment variable or api_key argument is required when fetching by project_id")
+            url = f"{self.base_url}/tasks"
+            params = {"project": project_id}
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            try:
+                response = requests.get(url, params=params, headers=headers, auth=(self.api_key, ''))
+                response.raise_for_status()
+                data = response.json()
+                return data.get("docs", [])
+            except requests.exceptions.RequestException as e:
+                logging.error(f"Error fetching from Scale API: {e}")
+                return []
         else:
-             return []
+            return []

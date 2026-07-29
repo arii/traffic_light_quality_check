@@ -91,11 +91,8 @@ The checks are based on the ObserveSign task specification and the annotation da
 
 With more time, I would focus on:
 
-1. Calibrating heuristic thresholds against a larger set of representative annotation data.
-2. Adding image-based checks for errors that cannot be reliably inferred from annotation geometry alone.
-3. Expanding the test corpus with additional valid and invalid annotation fixtures.
-4. Parallelizing task retrieval and evaluation for large-scale projects.
-5. Expanding the visual review interface to make human validation of flagged annotations faster.
+1. Adding validation schema files to allow custom taxonomy overrides without changing code.
+2. Expanding the test corpus with additional valid and invalid annotation fixtures.
 
 I especially like the explicit sentence:
 
