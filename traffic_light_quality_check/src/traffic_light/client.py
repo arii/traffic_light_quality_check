@@ -95,13 +95,19 @@ class ScaleClient:
         if file_path:
             with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
+                tasks = []
                 if isinstance(data, list):
-                    return data
+                    tasks = data
                 elif isinstance(data, dict) and "docs" in data:
-                    return data["docs"]
+                    tasks = data["docs"]
                 elif isinstance(data, dict) and "tasks" in data:
-                    return data["tasks"]
-                raise ValueError("Invalid file format. Expected a list of tasks or a dict with 'docs' or 'tasks' keys.")
+                    tasks = data["tasks"]
+                else:
+                    raise ValueError("Invalid file format. Expected a list of tasks or a dict with 'docs' or 'tasks' keys.")
+
+                if project_id:
+                    tasks = [t for t in tasks if t.get("projectId") == project_id or t.get("project") == project_id or t.get("project_id") == project_id]
+                return tasks
         elif project_id:
              if not self.api_key:
                  raise ValueError("SCALE_API_KEY environment variable or api_key argument is required when fetching by project_id")

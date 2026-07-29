@@ -4,7 +4,9 @@ from traffic_light.rules import (
     check_invalid_labels,
     check_invalid_attributes,
     check_out_of_bounds,
+    check_degenerate_boxes,
     check_micro_boxes,
+    check_extreme_aspect_ratio,
     check_giant_boxes,
     check_duplicate_boxes,
     check_suspicious_containment,
@@ -48,6 +50,21 @@ def test_micro_box():
     findings = check_micro_boxes(task, config)
     assert len(findings) == 1
     assert findings[0].rule_id == "GEO-002"
+
+def test_degenerate_box():
+    ann = Annotation(id="1", label="traffic_control_sign", box=BoundingBox(10, 10, 0, 50), attributes={})
+    task = Task(id="t1", image_url="", image_width=1000, image_height=1000, annotations=[ann])
+
+    findings_degenerate = check_degenerate_boxes(task, config)
+    assert len(findings_degenerate) == 1
+    assert findings_degenerate[0].rule_id == "GEO-005"
+    assert findings_degenerate[0].severity == "error"
+
+    findings_micro = check_micro_boxes(task, config)
+    assert len(findings_micro) == 0
+
+    findings_extreme = check_extreme_aspect_ratio(task, config)
+    assert len(findings_extreme) == 0
 
 def test_duplicate_boxes():
     ann1 = Annotation(id="1", label="traffic_control_sign", box=BoundingBox(10, 10, 50, 50), attributes={})
