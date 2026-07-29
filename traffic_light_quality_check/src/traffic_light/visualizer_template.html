@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ObserveSign - Quality Checker Visualizer</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            scale: {
+              900: '#18181b',
+              accent: '#3b82f6',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+    }
+    .code-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 4px;
+    }
+    .canvas-bg {
+      background-color: #090d16;
+      background-image:
+        radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0),
+        radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 0);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+    }
+    /* Glow effect for highlighted finding boxes */
+    .finding-glow {
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col bg-slate-950 text-slate-100 select-none">
+
+  <header class="h-14 border-b border-slate-800 bg-slate-900/90 backdrop-blur px-4 flex items-center justify-between z-30 flex-shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="bg-blue-600 p-2 rounded-lg text-white">
+        <i class="fa-solid fa-square-poll-vertical text-lg"></i>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="font-bold text-slate-100 text-base">ObserveSign</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">Quality Review Tool</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Task Dropdown Selector (Populated on JSON Ingestion) -->
+    <div class="flex items-center space-x-3">
+      <div id="task-select-wrapper" class="hidden flex items-center space-x-2">
+        <span class="text-xs text-slate-400 font-medium">Select Task:</span>
+        <select id="task-dropdown" class="bg-slate-950 border border-slate-800 text-xs text-blue-400 font-mono rounded-lg px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 max-w-xs truncate">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+
+      <button id="btn-load-json" class="px-3 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition flex items-center space-x-1.5 shadow">
+        <i class="fa-solid fa-file-import"></i>
+        <span>Import Tasks & Findings</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="app-container" class="flex-1 flex overflow-hidden relative">
+
+    <!-- Center Stage: Canvas Viewport -->
+    <main class="flex-1 flex flex-col bg-slate-950 relative overflow-hidden">
+
+      <!-- Toolbar controls -->
+      <div class="h-11 border-b border-slate-800 bg-slate-900/50 px-4 flex items-center justify-between z-10 text-xs">
+        <div class="flex items-center space-x-3">
+          <div class="flex items-center space-x-1 bg-slate-900 border border-slate-800 rounded-lg p-1">
+            <button id="btn-zoom-in" title="Zoom In" class="w-7 h-7 hover:bg-slate-800 rounded flex items-center justify-center text-slate-300">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+            <button id="btn-zoom-out" title="Zoom Out" class="w-7 h-7 hover:bg-slate-800 rounded flex items-center justify-center text-slate-300">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <button id="btn-zoom-reset" title="Reset Zoom" class="w-7 h-7 hover:bg-slate-800 rounded flex items-center justify-center text-slate-300">
+              <i class="fa-solid fa-expand"></i>
+            </button>
+            <span id="zoom-text" class="px-2 font-mono text-[11px] text-slate-400">100%</span>
+          </div>
+
+          <div class="h-4 w-px bg-slate-800"></div>
+
+          <!-- Layer toggles -->
+          <div class="flex items-center space-x-3 text-slate-300">
+            <label class="flex items-center space-x-1.5 cursor-pointer">
+              <input type="checkbox" id="toggle-boxes" checked class="rounded border-slate-700 bg-slate-800 text-blue-600">
+              <span>Bounding Boxes</span>
+            </label>
+            <label class="flex items-center space-x-1.5 cursor-pointer">
+              <input type="checkbox" id="toggle-labels" checked class="rounded border-slate-700 bg-slate-800 text-blue-600">
+              <span>Labels & Attributes</span>
+            </label>
+            <label class="flex items-center space-x-1.5 cursor-pointer">
+              <input type="checkbox" id="toggle-findings" checked class="rounded border-slate-700 bg-slate-800 text-rose-600">
+              <span>Show Finding Highlights</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="image-status-bar" class="text-[11px] text-slate-400 font-mono">
+          No dataset loaded
+        </div>
+      </div>
+
+      <!-- Drag & Drop Canvas Viewport -->
+      <div id="canvas-viewport" class="flex-1 canvas-bg relative overflow-hidden flex items-center justify-center cursor-grab active:cursor-grabbing">
+
+        <!-- Empty Drop Overlay (Visible when no data is loaded) -->
+        <div id="empty-state" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-950/90 p-6 text-center space-y-4">
+          <div class="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-2xl">
+            <i class="fa-solid fa-file-arrow-up"></i>
+          </div>
+          <div class="max-w-md space-y-1">
+            <h2 class="text-base font-bold text-slate-100">Drop Tasks and Quality Findings JSON</h2>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Drag and drop your Scale Task JSON (e.g. <code class="font-mono text-blue-400">output.json</code>) and/or Quality Findings JSON (e.g. <code class="font-mono text-blue-400">audit.json</code>) anywhere onto this page, or click below to paste raw data.
+            </p>
+          </div>
+          <button id="btn-empty-load" class="px-4 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition shadow">
+            Paste / Upload Data
+          </button>
+        </div>
+
+        <!-- Canvas Loader -->
+        <div id="canvas-loader" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-30 flex flex-col items-center justify-center space-y-2">
+          <i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-500"></i>
+          <span class="text-xs font-mono text-slate-300">Loading Task Attachment Image...</span>
+        </div>
+
+        <canvas id="main-canvas" class="max-w-none transition-transform duration-75"></canvas>
+      </div>
+
+      <!-- Bottom Info Bar -->
+      <div class="h-8 border-t border-slate-800 bg-slate-900/60 px-4 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+        <span id="canvas-dim">Dimensions: 0 x 0 px</span>
+        <span id="canvas-ann-count">Annotations: 0</span>
+        <span class="text-slate-500"><i class="fa-solid fa-mouse text-xs mr-1"></i> Scroll to Zoom | Drag to Pan | Hover boxes for Findings popup</span>
+      </div>
+    </main>
+
+    <aside class="w-96 border-l border-slate-800 bg-slate-900/80 flex flex-col flex-shrink-0 z-20 overflow-hidden">
+      <div class="h-11 border-b border-slate-800 px-4 flex items-center justify-between flex-shrink-0">
+        <span class="text-xs font-semibold text-slate-200">Quality Checker Findings</span>
+        <span id="badge-findings-total" class="text-[10px] font-mono bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded border border-rose-500/30">0 Findings</span>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-slate-800 text-xs font-medium bg-slate-950/50 flex-shrink-0">
+        <button id="tab-btn-findings" class="flex-1 py-2 text-center border-b-2 border-blue-500 text-blue-400">Quality Findings</button>
+        <button id="tab-btn-boxes" class="flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200">Boxes & Attributes</button>
+        <button id="tab-btn-raw" class="flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200">Task JSON</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-3 relative flex flex-col">
+
+        <!-- Quality Findings Pane -->
+        <div id="pane-findings" class="space-y-4 flex-1 flex flex-col">
+          <!-- Summary Dashboard panel -->
+          <div id="findings-dashboard" class="bg-slate-950 p-3 rounded-lg border border-slate-800/80 space-y-2">
+            <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono">Findings Summary</h4>
+            <div class="grid grid-cols-2 gap-2 text-center">
+              <button id="filter-error-btn" class="bg-red-950/20 hover:bg-red-950/40 border border-red-900/30 rounded-lg p-2 transition text-left flex items-center justify-between">
+                <span class="text-xs text-red-400 flex items-center space-x-1">
+                  <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                  <span>Errors</span>
+                </span>
+                <span id="summary-errors-count" class="text-xs font-bold font-mono text-red-400">0</span>
+              </button>
+              <button id="filter-warning-btn" class="bg-amber-950/20 hover:bg-amber-950/40 border border-amber-900/30 rounded-lg p-2 transition text-left flex items-center justify-between">
+                <span class="text-xs text-amber-400 flex items-center space-x-1">
+                  <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+                  <span>Warnings</span>
+                </span>
+                <span id="summary-warnings-count" class="text-xs font-bold font-mono text-amber-400">0</span>
+              </button>
+            </div>
+            <!-- Category Filters -->
+            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-1 border-t border-slate-900">
+              <span>Category Filters:</span>
+              <div class="flex space-x-1.5">
+                <button id="cat-filter-tax" class="px-1.5 py-0.5 rounded border border-slate-800 hover:border-slate-700 bg-slate-900 hover:text-slate-200 transition">Taxonomy</button>
+                <button id="cat-filter-geo" class="px-1.5 py-0.5 rounded border border-slate-800 hover:border-slate-700 bg-slate-900 hover:text-slate-200 transition">Geometry</button>
+                <button id="cat-filter-ovl" class="px-1.5 py-0.5 rounded border border-slate-800 hover:border-slate-700 bg-slate-900 hover:text-slate-200 transition">Overlap</button>
+              </div>
+            </div>
+            <!-- Clear Filters -->
+            <div id="filter-active-bar" class="hidden flex items-center justify-between text-[10px] text-blue-400 pt-1">
+              <span>Filters active</span>
+              <button id="btn-clear-filters" class="hover:underline flex items-center space-x-1">
+                <i class="fa-solid fa-filter-circle-xmark"></i>
+                <span>Clear Filters</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Finding Cards List -->
+          <div id="findings-list-container" class="space-y-2 flex-1 overflow-y-auto">
+            <p class="text-xs text-slate-500 text-center py-8">Load findings to inspect quality checks.</p>
+          </div>
+        </div>
+
+        <!-- Annotation Card List -->
+        <div id="pane-boxes" class="hidden space-y-2">
+          <p class="text-xs text-slate-500 text-center py-8">Load a task to inspect individual annotations.</p>
+        </div>
+
+        <!-- Raw JSON view -->
+        <div id="pane-raw" class="hidden h-full">
+          <pre id="raw-json-block" class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-[11px] code-font text-emerald-400 overflow-x-auto whitespace-pre-wrap select-text h-full leading-relaxed"></pre>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Ingestion Dialog -->
+  <div id="modal-json" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-w-2xl w-full p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-code text-blue-400 text-lg"></i>
+          <h3 class="text-base font-bold text-slate-100">Load Task & Quality Check Data</h3>
+        </div>
+        <button id="btn-close-modal" class="text-slate-400 hover:text-slate-200">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Scale Task JSON Area -->
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-slate-300 flex items-center space-x-1">
+            <i class="fa-solid fa-vector-square text-blue-400"></i>
+            <span>Scale Task JSON / output.json</span>
+          </label>
+          <textarea id="json-input-tasks" rows="9" placeholder='Paste Scale Task list or output.json' class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-[11px] code-font text-slate-200 focus:ring-blue-500 focus:border-blue-500 select-text"></textarea>
+        </div>
+
+        <!-- Quality Findings JSON Area -->
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-slate-300 flex items-center space-x-1">
+            <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
+            <span>Quality Findings JSON / audit.json</span>
+          </label>
+          <textarea id="json-input-findings" rows="9" placeholder='Paste checker audit results or audit.json' class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-[11px] code-font text-slate-200 focus:ring-blue-500 focus:border-blue-500 select-text"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+        <!-- Multi File Upload -->
+        <div>
+          <input type="file" id="file-input" accept=".json,.txt" multiple class="hidden">
+          <button id="btn-browse-file" class="px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 flex items-center space-x-1.5">
+            <i class="fa-solid fa-upload"></i>
+            <span>Browse files</span>
+          </button>
+          <span class="text-[10px] text-slate-400 ml-2">Tip: Select both files together!</span>
+        </div>
+
+        <div class="flex space-x-2">
+          <button id="btn-cancel-modal" class="px-3 py-1.5 text-xs font-medium bg-slate-800 text-slate-300 rounded-lg">Cancel</button>
+          <button id="btn-parse-json" class="px-4 py-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center space-x-1.5 shadow">
+            <i class="fa-solid fa-check"></i>
+            <span>Visualize Report</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <script>
+    // Embedded Data injected by CLI
+    // __EMBEDDED_DATA_REPLACEMENT_PLACEHOLDER__
+    const EMBEDDED_TASKS = null;
+    const EMBEDDED_FINDINGS = null;
+
+    // State management
+    let state = {
+      tasks: [],
+      findings: [],
+      currentTaskIndex: 0,
+      zoom: 1.0,
+      panX: 0,
+      panY: 0,
+      isDragging: false,
+      dragStart: { x: 0, y: 0 },
+      hoveredBoxUuid: null,
+      hoveredFindingId: null,
+      selectedBoxUuid: null,
+      layers: {
+        boxes: true,
+        labels: true,
+        findings: true
+      },
+      filters: {
+        severity: null, // 'error' or 'warning'
+        category: null  // 'taxonomy', 'geometry', or 'overlap'
+      }
+    };
+
+    // Color mappings
+    const CLASS_COLORS = [
+      { stroke: '#3b82f6', fill: 'rgba(59, 130, 246, 0.15)' },
+      { stroke: '#10b981', fill: 'rgba(16, 185, 129, 0.15)' },
+      { stroke: '#a855f7', fill: 'rgba(168, 85, 247, 0.15)' },
+      { stroke: '#f97316', fill: 'rgba(249, 115, 22, 0.15)' },
+      { stroke: '#06b6d4', fill: 'rgba(6, 182, 212, 0.15)' },
+      { stroke: '#eab308', fill: 'rgba(234, 179, 8, 0.15)' },
+      { stroke: '#ec4899', fill: 'rgba(236, 72, 153, 0.15)' },
+      { stroke: '#94a3b8', fill: 'rgba(148, 163, 184, 0.15)' }
+    ];
+
+    const labelColorMap = {};
+    let colorIdx = 0;
+
+    function getColorForLabel(label) {
+      if (!labelColorMap[label]) {
+        labelColorMap[label] = CLASS_COLORS[colorIdx % CLASS_COLORS.length];
+        colorIdx++;
+      }
+      return labelColorMap[label];
+    }
+
+    function getBoxCoords(ann) {
+      if (ann.left !== undefined) {
+        return { left: Number(ann.left) || 0, top: Number(ann.top) || 0, width: Number(ann.width) || 0, height: Number(ann.height) || 0 };
+      }
+      if (ann.location && ann.location.type === 'box') {
+        return { left: Number(ann.location.left) || 0, top: Number(ann.location.top) || 0, width: Number(ann.location.width) || 0, height: Number(ann.location.height) || 0 };
+      }
+      return { left: 0, top: 0, width: 0, height: 0 };
+    }
+
+    const canvas = document.getElementById('main-canvas');
+    const ctx = canvas.getContext('2d');
+    let loadedImage = new Image();
+
+    // Canvas rendering engine
+    function renderCanvas() {
+      if (!loadedImage.complete || !loadedImage.naturalWidth) return;
+
+      const task = state.tasks[state.currentTaskIndex];
+      if (!task) return;
+
+      const annotations = task.response?.annotations || [];
+      const taskFindings = state.findings.filter(f => f.task_id === (task.task_id || task._id || task.id));
+
+      canvas.width = loadedImage.naturalWidth;
+      canvas.height = loadedImage.naturalHeight;
+      canvas.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(loadedImage, 0, 0);
+
+      if (!state.layers.boxes) return;
+
+      // First Draw Finding Highlights/Glows beneath boxes
+      if (state.layers.findings) {
+        taskFindings.forEach(f => {
+          // Highlight primary box
+          if (f.annotation_id) {
+            const primaryAnn = annotations.find(a => (a.uuid || a.id) === f.annotation_id);
+            if (primaryAnn) {
+              const box = getBoxCoords(primaryAnn);
+              const isHovered = state.hoveredFindingId === f.rule_id + f.annotation_id || state.hoveredBoxUuid === f.annotation_id;
+
+              ctx.save();
+              ctx.shadowColor = f.severity === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(245, 158, 11, 0.9)';
+              ctx.shadowBlur = isHovered ? 25 : 12;
+              ctx.strokeStyle = f.severity === 'error' ? 'rgba(239, 68, 68, 0.7)' : 'rgba(245, 158, 11, 0.7)';
+              ctx.lineWidth = isHovered ? 4 : 2;
+              ctx.setLineDash([6, 4]);
+              ctx.strokeRect(box.left - 2, box.top - 2, box.width + 4, box.height + 4);
+              ctx.restore();
+
+              // Draw connection line/glow to secondary overlap boxes
+              const secondaryId = f.evidence?.other_annotation_id || f.evidence?.outer_annotation_id;
+              if (secondaryId) {
+                const secondaryAnn = annotations.find(a => (a.uuid || a.id) === secondaryId);
+                if (secondaryAnn) {
+                  const sBox = getBoxCoords(secondaryAnn);
+                  ctx.save();
+                  ctx.shadowColor = 'rgba(59, 130, 246, 0.8)';
+                  ctx.shadowBlur = isHovered ? 20 : 8;
+                  ctx.strokeStyle = 'rgba(59, 130, 246, 0.6)';
+                  ctx.lineWidth = isHovered ? 3 : 1.5;
+                  ctx.setLineDash([4, 4]);
+                  ctx.strokeRect(sBox.left - 2, sBox.top - 2, sBox.width + 4, sBox.height + 4);
+
+                  // Connection line if hovered
+                  if (isHovered) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(box.left + box.width / 2, box.top + box.height / 2);
+                    ctx.lineTo(sBox.left + sBox.width / 2, sBox.top + sBox.height / 2);
+                    ctx.stroke();
+                  }
+                  ctx.restore();
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Draw Normal Annotation Bounding Boxes
+      annotations.forEach((ann, idx) => {
+        const box = getBoxCoords(ann);
+        const color = getColorForLabel(ann.label || 'Unlabeled');
+
+        const annId = ann.uuid || ann.id || idx;
+        const isHovered = state.hoveredBoxUuid === annId;
+        const isSelected = state.selectedBoxUuid === annId;
+
+        // Find if this box has a finding
+        const hasError = taskFindings.some(f => f.annotation_id === annId && f.severity === 'error');
+        const hasWarning = taskFindings.some(f => f.annotation_id === annId && f.severity === 'warning');
+
+        ctx.save();
+
+        // Custom filling
+        if (isSelected) {
+          ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+        } else if (isHovered) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        } else {
+          ctx.fillStyle = color.fill;
+        }
+        ctx.fillRect(box.left, box.top, box.width, box.height);
+
+        // Border
+        if (isSelected) {
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = '#3b82f6';
+        } else if (isHovered) {
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = '#ffffff';
+        } else if (hasError && state.layers.findings) {
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#ef4444'; // Red error border
+        } else if (hasWarning && state.layers.findings) {
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#f59e0b'; // Orange warning border
+        } else {
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = color.stroke;
+        }
+        ctx.strokeRect(box.left, box.top, box.width, box.height);
+        ctx.restore();
+
+        // Label / attributes text
+        if (state.layers.labels) {
+          ctx.save();
+          const fontSize = Math.max(11, Math.min(16, box.height * 0.35 || 13));
+          ctx.font = `600 ${fontSize}px Inter, sans-serif`;
+
+          let attrText = '';
+          if (ann.attributes) {
+            const keys = Object.keys(ann.attributes);
+            if (keys.length > 0) {
+              attrText = ` [${ann.attributes[keys[0]]}]`;
+            }
+          }
+
+          const labelStr = `${ann.label || 'Object'}${attrText}`;
+          const textWidth = ctx.measureText(labelStr).width;
+
+          // Background box for label text
+          let bgStyle = color.stroke;
+          if (hasError && state.layers.findings) bgStyle = '#ef4444';
+          else if (hasWarning && state.layers.findings) bgStyle = '#f59e0b';
+          if (isSelected) bgStyle = '#3b82f6';
+
+          ctx.fillStyle = bgStyle;
+          ctx.fillRect(box.left, Math.max(0, box.top - 20), textWidth + 8, 20);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(labelStr, box.left + 4, Math.max(14, box.top - 5));
+          ctx.restore();
+        }
+      });
+    }
+
+    function loadCurrentTask() {
+      const task = state.tasks[state.currentTaskIndex];
+      if (!task) return;
+
+      document.getElementById('empty-state').classList.add('hidden');
+      const loader = document.getElementById('canvas-loader');
+      loader.classList.remove('hidden');
+
+      let imgUrl = task.params?.attachment || task.document_pages?.[0]?.url || task.params?.attachments?.[0];
+      if (!imgUrl) {
+        showToast('Task does not contain a valid image attachment URL', 'error');
+        loader.classList.add('hidden');
+        return;
+      }
+
+      if (imgUrl.startsWith('http://')) {
+        imgUrl = imgUrl.replace('http://', 'https://');
+      }
+
+      const taskId = task.task_id || task._id || task.id || 'Unknown';
+      document.getElementById('image-status-bar').textContent = `Task ID: ${taskId} | Project: ${task.project || 'ObserveSign Sign detection'}`;
+
+      loadedImage = new Image();
+      loadedImage.crossOrigin = 'anonymous';
+      loadedImage.src = imgUrl;
+
+      loadedImage.onload = () => {
+        loader.classList.add('hidden');
+        document.getElementById('canvas-dim').textContent = `Dimensions: ${loadedImage.naturalWidth} x ${loadedImage.naturalHeight} px`;
+        document.getElementById('canvas-ann-count').textContent = `Annotations: ${task.response?.annotations?.length || 0}`;
+        resetZoomAndPan();
+        renderCanvas();
+        updateFindingsTab();
+        updateAnnotationsTab();
+        document.getElementById('raw-json-block').textContent = JSON.stringify(task, null, 2);
+      };
+
+      loadedImage.onerror = () => {
+        loader.classList.add('hidden');
+        showToast('Failed to load image from attachment URL', 'error');
+      };
+    }
+
+    function resetZoomAndPan() {
+      const container = document.getElementById('canvas-viewport');
+      if (loadedImage.naturalWidth && container.clientWidth) {
+        const scaleX = (container.clientWidth - 60) / loadedImage.naturalWidth;
+        const scaleY = (container.clientHeight - 60) / loadedImage.naturalHeight;
+        state.zoom = Math.min(scaleX, scaleY, 1.0);
+      } else {
+        state.zoom = 1.0;
+      }
+      state.panX = 0; state.panY = 0;
+      document.getElementById('zoom-text').textContent = `${Math.round(state.zoom * 100)}%`;
+    }
+
+    // Function to pan and zoom onto a specific bounding box
+    function focusOnBox(box) {
+      if (!box || !loadedImage.naturalWidth) return;
+      const viewport = document.getElementById('canvas-viewport');
+      const vw = viewport.clientWidth;
+      const vh = viewport.clientHeight;
+
+      // Calculate proper scale to zoom into the box comfortably
+      const boxW = box.width || 50;
+      const boxH = box.height || 50;
+      const scaleX = (vw * 0.5) / boxW;
+      const scaleY = (vh * 0.5) / boxH;
+
+      state.zoom = Math.max(0.5, Math.min(2.5, Math.min(scaleX, scaleY)));
+      document.getElementById('zoom-text').textContent = `${Math.round(state.zoom * 100)}%`;
+
+      // Position the box in the center of the viewport
+      const boxCenterX = box.left + boxW / 2;
+      const boxCenterY = box.top + boxH / 2;
+
+      state.panX = (vw / 2) - (boxCenterX * state.zoom);
+      state.panY = (vh / 2) - (boxCenterY * state.zoom);
+
+      renderCanvas();
+    }
+
+    // Update Quality Findings Panel
+    function updateFindingsTab() {
+      const task = state.tasks[state.currentTaskIndex];
+      if (!task) return;
+
+      const taskId = task.task_id || task._id || task.id;
+      const annotations = task.response?.annotations || [];
+
+      // Filter findings for this task
+      const allTaskFindings = state.findings.filter(f => f.task_id === taskId);
+
+      // Update Summary metrics
+      const errors = allTaskFindings.filter(f => f.severity === 'error');
+      const warnings = allTaskFindings.filter(f => f.severity === 'warning');
+
+      document.getElementById('summary-errors-count').textContent = errors.length;
+      document.getElementById('summary-warnings-count').textContent = warnings.length;
+      document.getElementById('badge-findings-total').textContent = `${allTaskFindings.length} Findings`;
+
+      // Filter findings according to UI filter options
+      let filteredFindings = allTaskFindings;
+      if (state.filters.severity) {
+        filteredFindings = filteredFindings.filter(f => f.severity === state.filters.severity);
+      }
+      if (state.filters.category) {
+        filteredFindings = filteredFindings.filter(f => f.category === state.filters.category);
+      }
+
+      // Show/hide filter reset helper
+      const hasActiveFilters = state.filters.severity || state.filters.category;
+      document.getElementById('filter-active-bar').className = hasActiveFilters ? 'flex items-center justify-between text-[10px] text-blue-400 pt-1' : 'hidden';
+
+      const listContainer = document.getElementById('findings-list-container');
+      listContainer.innerHTML = '';
+
+      if (filteredFindings.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-8">${allTaskFindings.length > 0 ? 'No findings match current filters.' : 'Excellent! No quality findings on this task.'}</p>`;
+        return;
+      }
+
+      filteredFindings.forEach(f => {
+        const card = document.createElement('div');
+        const annId = f.annotation_id;
+
+        const isHovered = state.hoveredFindingId === f.rule_id + annId;
+
+        let colorClass = f.severity === 'error' ? 'border-red-900/40 hover:border-red-600 bg-red-950/10' : 'border-amber-900/40 hover:border-amber-500 bg-amber-950/10';
+        if (isHovered) {
+          colorClass += f.severity === 'error' ? ' border-red-500' : ' border-amber-400';
+        }
+
+        // Try to identify associated box details
+        let boxDetails = '';
+        const affectedAnn = annotations.find(a => (a.uuid || a.id) === annId);
+        if (affectedAnn) {
+          const coords = getBoxCoords(affectedAnn);
+          boxDetails = `<div class="text-[10px] text-slate-400 font-mono mt-1">Label: <span class="text-slate-200 font-semibold">${affectedAnn.label}</span></div>`;
+        }
+
+        let evidenceHtml = '';
+        if (f.evidence && Object.keys(f.evidence).length > 0) {
+          evidenceHtml = `<div class="text-[10px] font-mono text-slate-400 bg-slate-950 p-2 rounded border border-slate-800/80 mt-1.5 space-y-0.5">
+            ${Object.entries(f.evidence).map(([k, v]) => `<div><span class="text-slate-500">${k}:</span> <span class="text-blue-400">${JSON.stringify(v)}</span></div>`).join('')}
+          </div>`;
+        }
+
+        card.className = `p-3 rounded-lg border cursor-pointer transition text-xs flex flex-col space-y-1.5 ${colorClass}`;
+
+        card.onmouseenter = () => {
+          state.hoveredFindingId = f.rule_id + annId;
+          state.hoveredBoxUuid = annId;
+          renderCanvas();
+        };
+        card.onmouseleave = () => {
+          state.hoveredFindingId = null;
+          state.hoveredBoxUuid = null;
+          renderCanvas();
+        };
+        card.onclick = () => {
+          if (affectedAnn) {
+            state.selectedBoxUuid = annId;
+            focusOnBox(getBoxCoords(affectedAnn));
+          }
+        };
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-bold flex items-center space-x-1.5 ${f.severity === 'error' ? 'text-red-400' : 'text-amber-400'}">
+              <i class="fa-solid ${f.severity === 'error' ? 'fa-circle-exclamation' : 'fa-triangle-exclamation'}"></i>
+              <span>${f.severity.toUpperCase()} [${f.rule_id}]</span>
+            </span>
+            <span class="text-[10px] font-mono uppercase bg-slate-900 border border-slate-800 text-slate-400 px-1.5 py-0.5 rounded">${f.category}</span>
+          </div>
+          <p class="text-slate-200 leading-relaxed font-medium text-[11px]">${f.message}</p>
+          ${boxDetails}
+          ${evidenceHtml}
+        `;
+
+        listContainer.appendChild(card);
+      });
+    }
+
+    // Update Boxes & Attributes Panel
+    function updateAnnotationsTab() {
+      const task = state.tasks[state.currentTaskIndex];
+      if (!task) return;
+
+      const taskId = task.task_id || task._id || task.id;
+      const annotations = task.response?.annotations || [];
+      const taskFindings = state.findings.filter(f => f.task_id === taskId);
+
+      const listContainer = document.getElementById('pane-boxes');
+      listContainer.innerHTML = '';
+
+      if (annotations.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-8">Task response contains 0 annotations.</p>`;
+        return;
+      }
+
+      annotations.forEach((ann, idx) => {
+        const annId = ann.uuid || ann.id || idx;
+        const coords = getBoxCoords(ann);
+        const color = getColorForLabel(ann.label || 'Unlabeled');
+
+        // Findings for this specific annotation
+        const annFindings = taskFindings.filter(f => f.annotation_id === annId);
+        const hasError = annFindings.some(f => f.severity === 'error');
+        const hasWarning = annFindings.some(f => f.severity === 'warning');
+
+        const card = document.createElement('div');
+
+        let borderClass = 'border-slate-800/80 hover:border-slate-700 bg-slate-950';
+        if (state.selectedBoxUuid === annId) {
+          borderClass = 'border-blue-500 bg-slate-900';
+        } else if (hasError && state.layers.findings) {
+          borderClass = 'border-red-900/60 hover:border-red-700 bg-red-950/5';
+        } else if (hasWarning && state.layers.findings) {
+          borderClass = 'border-amber-900/60 hover:border-amber-700 bg-amber-950/5';
+        }
+
+        card.className = `p-3 rounded-lg border transition cursor-pointer text-xs space-y-1.5 ${borderClass}`;
+
+        card.onmouseenter = () => { state.hoveredBoxUuid = annId; renderCanvas(); };
+        card.onmouseleave = () => { state.hoveredBoxUuid = null; renderCanvas(); };
+        card.onclick = () => {
+          state.selectedBoxUuid = annId;
+          // Trigger tab switch to Findings if it has findings
+          if (annFindings.length > 0) {
+            // switch to findings tab optionally, or highlight findings in the current list
+            showToast(`Annotation has ${annFindings.length} quality check issues!`, 'info');
+          }
+          focusOnBox(coords);
+          updateAnnotationsTab(); // redraw list to show selection border
+        };
+
+        let attrsHtml = '';
+        if (ann.attributes && Object.keys(ann.attributes).length > 0) {
+          attrsHtml = `<div class="text-[10px] text-slate-400 font-mono bg-slate-900 p-2 rounded border border-slate-800/50 mt-1">
+            ${Object.entries(ann.attributes).map(([k, v]) => `<span class="text-slate-500">${k}:</span> <span class="text-blue-300">${v}</span>`).join(' | ')}
+          </div>`;
+        }
+
+        // Findings badges on annotation cards
+        let findingsBadges = '';
+        if (annFindings.length > 0) {
+          findingsBadges = `<div class="flex flex-wrap gap-1 mt-1">
+            ${annFindings.map(f => `
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded flex items-center space-x-1 ${f.severity === 'error' ? 'bg-red-500/15 text-red-400 border border-red-500/20' : 'bg-amber-500/15 text-amber-400 border border-amber-500/20'}">
+                <i class="fa-solid ${f.severity === 'error' ? 'fa-circle-exclamation' : 'fa-triangle-exclamation'}"></i>
+                <span>${f.rule_id}</span>
+              </span>
+            `).join('')}
+          </div>`;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-bold flex items-center space-x-1.5" style="color: ${color.stroke}">
+              <span class="w-2 h-2 rounded-full inline-block" style="background-color: ${color.stroke}"></span>
+              <span>${ann.label || 'Unlabeled'}</span>
+            </span>
+            <span class="font-mono text-[10px] text-slate-500">#${idx + 1}</span>
+          </div>
+          <div class="font-mono text-[10px] text-slate-400">
+            Box: [L: ${coords.left}, T: ${coords.top}, W: ${coords.width}, H: ${coords.height}]
+          </div>
+          ${attrsHtml}
+          ${findingsBadges}
+        `;
+
+        listContainer.appendChild(card);
+      });
+    }
+
+    // Ingest data from inputs
+    function ingestJsonPayload(tasksText, findingsText) {
+      let taskList = [];
+      let findingsList = [];
+
+      try {
+        if (tasksText.trim()) {
+          const parsed = JSON.parse(tasksText.trim());
+          if (parsed.docs && Array.isArray(parsed.docs)) {
+            taskList = parsed.docs;
+          } else if (Array.isArray(parsed)) {
+            taskList = parsed;
+          } else if (parsed.task_id || parsed.id || parsed.response) {
+            taskList = [parsed];
+          }
+        }
+      } catch (e) {
+        showToast(`Invalid Task JSON: ${e.message}`, 'error');
+        return;
+      }
+
+      try {
+        if (findingsText.trim()) {
+          const parsed = JSON.parse(findingsText.trim());
+          if (Array.isArray(parsed)) {
+            findingsList = parsed;
+          } else {
+            findingsList = [parsed];
+          }
+        }
+      } catch (e) {
+        showToast(`Invalid Findings JSON: ${e.message}`, 'error');
+        return;
+      }
+
+      if (taskList.length === 0) {
+        showToast('Please load valid Task JSON data', 'error');
+        return;
+      }
+
+      state.tasks = taskList;
+      state.findings = findingsList;
+      state.currentTaskIndex = 0;
+
+      // Populate active task dropdown
+      const select = document.getElementById('task-dropdown');
+      select.innerHTML = '';
+      taskList.forEach((t, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        const tId = t.task_id || t._id || t.id || 'Task';
+        opt.textContent = `${i + 1}. Task ${tId.toString().slice(-8)} (${t.project || 'ObserveSign'})`;
+        select.appendChild(opt);
+      });
+
+      document.getElementById('task-select-wrapper').classList.remove('hidden');
+      document.getElementById('modal-json').classList.add('hidden');
+
+      loadCurrentTask();
+      showToast(`Successfully loaded ${taskList.length} tasks and ${findingsList.length} quality findings!`, 'success');
+    }
+
+    // Multi-file drag and drop & upload handling
+    function handleFiles(files) {
+      if (files.length === 0) return;
+
+      let taskContent = "";
+      let findingContent = "";
+      let filesProcessed = 0;
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const text = evt.target.result.trim();
+          try {
+            const parsed = JSON.parse(text);
+            // Intelligently identify if this is a findings file or task file
+            if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].rule_id !== undefined) {
+              findingContent = text;
+            } else if (Array.isArray(parsed) || parsed.docs || parsed.task_id || parsed.id) {
+              taskContent = text;
+            } else {
+              // Fallback based on name
+              if (file.name.includes('audit') || file.name.includes('finding')) {
+                findingContent = text;
+              } else {
+                taskContent = text;
+              }
+            }
+          } catch(e) {
+            showToast(`Could not parse file ${file.name} as JSON`, 'error');
+          }
+
+          filesProcessed++;
+          if (filesProcessed === files.length) {
+            // Apply loaded contents
+            if (taskContent) document.getElementById('json-input-tasks').value = taskContent;
+            if (findingContent) document.getElementById('json-input-findings').value = findingContent;
+
+            // If dragging directly onto viewport, parse instantly!
+            if (modal.classList.contains('hidden')) {
+              ingestJsonPayload(taskContent || document.getElementById('json-input-tasks').value, findingContent || document.getElementById('json-input-findings').value);
+            } else {
+              showToast("Loaded files into input boxes. Click Visualize to display.", "info");
+            }
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    // Drag and Drop listeners
+    window.addEventListener('dragover', (e) => e.preventDefault());
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      handleFiles(e.dataTransfer.files);
+    });
+
+    // Ingestion Dialog UI listeners
+    const modal = document.getElementById('modal-json');
+    const openModal = () => modal.classList.remove('hidden');
+    const closeModal = () => modal.classList.add('hidden');
+
+    document.getElementById('btn-load-json').onclick = openModal;
+    document.getElementById('btn-empty-load').onclick = openModal;
+    document.getElementById('btn-close-modal').onclick = closeModal;
+    document.getElementById('btn-cancel-modal').onclick = closeModal;
+
+    document.getElementById('btn-browse-file').onclick = () => document.getElementById('file-input').click();
+    document.getElementById('file-input').onchange = (e) => handleFiles(e.target.files);
+
+    document.getElementById('btn-parse-json').onclick = () => {
+      const tasksVal = document.getElementById('json-input-tasks').value;
+      const findingsVal = document.getElementById('json-input-findings').value;
+      ingestJsonPayload(tasksVal, findingsVal);
+    };
+
+    document.getElementById('task-dropdown').onchange = (e) => {
+      state.currentTaskIndex = Number(e.target.value) || 0;
+      state.selectedBoxUuid = null;
+      loadCurrentTask();
+    };
+
+    // Canvas Mouse Zoom / Pan
+    const viewport = document.getElementById('canvas-viewport');
+    viewport.addEventListener('mousedown', (e) => {
+      // Allow dragging only when clicking outside active controls (handled automatically unless stopped)
+      state.isDragging = true;
+      state.dragStart = { x: e.clientX - state.panX, y: e.clientY - state.panY };
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (state.isDragging) {
+        state.panX = e.clientX - state.dragStart.x;
+        state.panY = e.clientY - state.dragStart.y;
+        renderCanvas();
+      }
+    });
+    window.addEventListener('mouseup', () => state.isDragging = false);
+
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+      state.zoom = Math.max(0.1, Math.min(5.0, state.zoom * zoomFactor));
+      document.getElementById('zoom-text').textContent = `${Math.round(state.zoom * 100)}%`;
+      renderCanvas();
+    }, { passive: false });
+
+    document.getElementById('btn-zoom-in').onclick = () => { state.zoom *= 1.15; renderCanvas(); };
+    document.getElementById('btn-zoom-out').onclick = () => { state.zoom *= 0.85; renderCanvas(); };
+    document.getElementById('btn-zoom-reset').onclick = resetZoomAndPan;
+
+    document.getElementById('toggle-boxes').onchange = (e) => { state.layers.boxes = e.target.checked; renderCanvas(); };
+    document.getElementById('toggle-labels').onchange = (e) => { state.layers.labels = e.target.checked; renderCanvas(); };
+    document.getElementById('toggle-findings').onchange = (e) => { state.layers.findings = e.target.checked; renderCanvas(); };
+
+    // Sidebar Tabs switching
+    const tabBtnFindings = document.getElementById('tab-btn-findings');
+    const tabBtnBoxes = document.getElementById('tab-btn-boxes');
+    const tabBtnRaw = document.getElementById('tab-btn-raw');
+
+    const paneFindings = document.getElementById('pane-findings');
+    const paneBoxes = document.getElementById('pane-boxes');
+    const paneRaw = document.getElementById('pane-raw');
+
+    tabBtnFindings.onclick = () => {
+      paneFindings.classList.remove('hidden');
+      paneBoxes.classList.add('hidden');
+      paneRaw.classList.add('hidden');
+      tabBtnFindings.className = "flex-1 py-2 text-center border-b-2 border-blue-500 text-blue-400 font-medium";
+      tabBtnBoxes.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
+      tabBtnRaw.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
+    };
+    tabBtnBoxes.onclick = () => {
+      paneFindings.classList.add('hidden');
+      paneBoxes.classList.remove('hidden');
+      paneRaw.classList.add('hidden');
+      tabBtnBoxes.className = "flex-1 py-2 text-center border-b-2 border-blue-500 text-blue-400 font-medium";
+      tabBtnFindings.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
+      tabBtnRaw.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
+    };
+    tabBtnRaw.onclick = () => {
+      paneFindings.classList.add('hidden');
+      paneBoxes.classList.add('hidden');
+      paneRaw.classList.remove('hidden');
+      tabBtnRaw.className = "flex-1 py-2 text-center border-b-2 border-blue-500 text-blue-400 font-medium";
+      tabBtnFindings.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
+      tabBtnBoxes.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
+    };
+
+    // Severity summary filter actions
+    document.getElementById('filter-error-btn').onclick = () => {
+      toggleSeverityFilter('error');
+    };
+    document.getElementById('filter-warning-btn').onclick = () => {
+      toggleSeverityFilter('warning');
+    };
+
+    function toggleSeverityFilter(severity) {
+      if (state.filters.severity === severity) {
+        state.filters.severity = null;
+      } else {
+        state.filters.severity = severity;
+      }
+      updateFiltersUI();
+      updateFindingsTab();
+    }
+
+    // Category filter button actions
+    const catTaxBtn = document.getElementById('cat-filter-tax');
+    const catGeoBtn = document.getElementById('cat-filter-geo');
+    const catOvlBtn = document.getElementById('cat-filter-ovl');
+
+    catTaxBtn.onclick = () => toggleCategoryFilter('taxonomy');
+    catGeoBtn.onclick = () => toggleCategoryFilter('geometry');
+    catOvlBtn.onclick = () => toggleCategoryFilter('overlap');
+
+    function toggleCategoryFilter(category) {
+      if (state.filters.category === category) {
+        state.filters.category = null;
+      } else {
+        state.filters.category = category;
+      }
+      updateFiltersUI();
+      updateFindingsTab();
+    }
+
+    function updateFiltersUI() {
+      // Update severity filter highlights
+      const errorBtn = document.getElementById('filter-error-btn');
+      const warningBtn = document.getElementById('filter-warning-btn');
+
+      if (state.filters.severity === 'error') {
+        errorBtn.className = "bg-red-500/20 hover:bg-red-500/30 border-2 border-red-500 rounded-lg p-2 transition text-left flex items-center justify-between";
+        warningBtn.className = "bg-amber-950/20 hover:bg-amber-950/40 border border-amber-900/30 opacity-40 rounded-lg p-2 transition text-left flex items-center justify-between";
+      } else if (state.filters.severity === 'warning') {
+        errorBtn.className = "bg-red-950/20 hover:bg-red-950/40 border border-red-900/30 opacity-40 rounded-lg p-2 transition text-left flex items-center justify-between";
+        warningBtn.className = "bg-amber-500/20 hover:bg-amber-500/30 border-2 border-amber-500 rounded-lg p-2 transition text-left flex items-center justify-between";
+      } else {
+        errorBtn.className = "bg-red-950/20 hover:bg-red-950/40 border border-red-900/30 rounded-lg p-2 transition text-left flex items-center justify-between";
+        warningBtn.className = "bg-amber-950/20 hover:bg-amber-950/40 border border-amber-900/30 rounded-lg p-2 transition text-left flex items-center justify-between";
+      }
+
+      // Update category highlights
+      catTaxBtn.className = state.filters.category === 'taxonomy' ? "px-1.5 py-0.5 rounded border border-blue-500 bg-blue-950/40 text-blue-300 font-bold transition" : "px-1.5 py-0.5 rounded border border-slate-800 hover:border-slate-700 bg-slate-900 hover:text-slate-200 transition";
+      catGeoBtn.className = state.filters.category === 'geometry' ? "px-1.5 py-0.5 rounded border border-blue-500 bg-blue-950/40 text-blue-300 font-bold transition" : "px-1.5 py-0.5 rounded border border-slate-800 hover:border-slate-700 bg-slate-900 hover:text-slate-200 transition";
+      catOvlBtn.className = state.filters.category === 'overlap' ? "px-1.5 py-0.5 rounded border border-blue-500 bg-blue-950/40 text-blue-300 font-bold transition" : "px-1.5 py-0.5 rounded border border-slate-800 hover:border-slate-700 bg-slate-900 hover:text-slate-200 transition";
+    }
+
+    document.getElementById('btn-clear-filters').onclick = () => {
+      state.filters.severity = null;
+      state.filters.category = null;
+      updateFiltersUI();
+      updateFindingsTab();
+    };
+
+    // Canvas click detection and hover box detection
+    function getCanvasCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / state.zoom;
+      const y = (e.clientY - rect.top) / state.zoom;
+      return { x, y };
+    }
+
+    // Canvas click to select a box
+    viewport.addEventListener('click', (e) => {
+      if (state.isDragging) return; // ignore clicks if dragging
+      const clickCoords = getCanvasCoords(e);
+      const task = state.tasks[state.currentTaskIndex];
+      if (!task) return;
+
+      const annotations = task.response?.annotations || [];
+
+      // Find bounding box that contains the clicked point (checking from top-most, reverse list order)
+      let foundIndex = -1;
+      for (let i = annotations.length - 1; i >= 0; i--) {
+        const coords = getBoxCoords(annotations[i]);
+        if (clickCoords.x >= coords.left && clickCoords.x <= coords.left + coords.width &&
+            clickCoords.y >= coords.top && clickCoords.y <= coords.top + coords.height) {
+          foundIndex = i;
+          break;
+        }
+      }
+
+      if (foundIndex !== -1) {
+        const ann = annotations[foundIndex];
+        const annId = ann.uuid || ann.id || foundIndex;
+        state.selectedBoxUuid = annId;
+        showToast(`Selected Bounding Box: ${ann.label}`, 'info');
+        focusOnBox(getBoxCoords(ann));
+        // Switch to boxes tab
+        tabBtnBoxes.click();
+        // Highlight active card in sidebar
+        updateAnnotationsTab();
+      } else {
+        state.selectedBoxUuid = null;
+        updateAnnotationsTab();
+        renderCanvas();
+      }
+    });
+
+    // Canvas hover detection for popup tooltips and findings
+    let canvasTooltip = null;
+
+    viewport.addEventListener('mousemove', (e) => {
+      if (state.isDragging) {
+        removeTooltip();
+        return;
+      }
+
+      const hoverCoords = getCanvasCoords(e);
+      const task = state.tasks[state.currentTaskIndex];
+      if (!task) return;
+
+      const annotations = task.response?.annotations || [];
+      const taskId = task.task_id || task._id || task.id;
+      const taskFindings = state.findings.filter(f => f.task_id === taskId);
+
+      let foundIndex = -1;
+      for (let i = annotations.length - 1; i >= 0; i--) {
+        const coords = getBoxCoords(annotations[i]);
+        if (hoverCoords.x >= coords.left && hoverCoords.x <= coords.left + coords.width &&
+            hoverCoords.y >= coords.top && hoverCoords.y <= coords.top + coords.height) {
+          foundIndex = i;
+          break;
+        }
+      }
+
+      if (foundIndex !== -1) {
+        const ann = annotations[foundIndex];
+        const annId = ann.uuid || ann.id || foundIndex;
+
+        if (state.hoveredBoxUuid !== annId) {
+          state.hoveredBoxUuid = annId;
+          renderCanvas();
+
+          // Show tooltip if there are findings for this box
+          const boxFindings = taskFindings.filter(f => f.annotation_id === annId);
+          if (boxFindings.length > 0) {
+            showCanvasTooltip(e, ann, boxFindings);
+          } else {
+            removeTooltip();
+          }
+        }
+      } else {
+        if (state.hoveredBoxUuid !== null) {
+          state.hoveredBoxUuid = null;
+          renderCanvas();
+          removeTooltip();
+        }
+      }
+    });
+
+    viewport.addEventListener('mouseleave', () => {
+      state.hoveredBoxUuid = null;
+      renderCanvas();
+      removeTooltip();
+    });
+
+    function showCanvasTooltip(e, ann, findings) {
+      removeTooltip();
+
+      canvasTooltip = document.createElement('div');
+      canvasTooltip.className = 'absolute bg-slate-950 border border-slate-800 p-3 rounded-lg shadow-2xl text-xs space-y-2 pointer-events-none z-40 max-w-sm transition-opacity duration-150';
+      canvasTooltip.style.left = `${e.clientX + 15}px`;
+      canvasTooltip.style.top = `${e.clientY + 15}px`;
+
+      let findingsHtml = findings.map(f => `
+        <div class="border-t border-slate-900 pt-1.5 mt-1.5 first:border-0 first:pt-0 first:mt-0">
+          <div class="flex items-center space-x-1.5 font-bold ${f.severity === 'error' ? 'text-red-400' : 'text-amber-400'}">
+            <i class="fa-solid ${f.severity === 'error' ? 'fa-circle-exclamation' : 'fa-triangle-exclamation'}"></i>
+            <span>${f.severity.toUpperCase()} [${f.rule_id}]</span>
+          </div>
+          <p class="text-slate-300 mt-0.5 leading-relaxed font-mono text-[10px]">${f.message}</p>
+        </div>
+      `).join('');
+
+      canvasTooltip.innerHTML = `
+        <div>
+          <span class="font-bold text-slate-100">${ann.label}</span>
+          <span class="text-[10px] text-slate-500 font-mono"> (Hovered Annotation)</span>
+        </div>
+        ${findingsHtml}
+      `;
+
+      document.body.appendChild(canvasTooltip);
+    }
+
+    function removeTooltip() {
+      if (canvasTooltip) {
+        canvasTooltip.remove();
+        canvasTooltip = null;
+      }
+    }
+
+    // Helper to display toast notifications
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `p-3 rounded-lg shadow-xl text-xs font-medium text-white flex items-center space-x-2 transition-all duration-300 pointer-events-auto ${type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-rose-600' : 'bg-blue-600')}`;
+      toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i><span>${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    // Initialize application
+    window.addEventListener('load', () => {
+      // Check if data is embedded directly from Python export
+      if (EMBEDDED_TASKS && EMBEDDED_TASKS.length > 0) {
+        state.tasks = EMBEDDED_TASKS;
+        state.findings = EMBEDDED_FINDINGS || [];
+
+        // Populate active task dropdown
+        const select = document.getElementById('task-dropdown');
+        select.innerHTML = '';
+        state.tasks.forEach((t, i) => {
+          const opt = document.createElement('option');
+          opt.value = i;
+          const tId = t.task_id || t._id || t.id || 'Task';
+          opt.textContent = `${i + 1}. Task ${tId.toString().slice(-8)} (${t.project || 'ObserveSign'})`;
+          select.appendChild(opt);
+        });
+
+        document.getElementById('task-select-wrapper').classList.remove('hidden');
+        document.getElementById('modal-json').classList.add('hidden');
+        document.getElementById('empty-state').classList.add('hidden');
+
+        loadCurrentTask();
+        showToast('Successfully loaded embedded report tasks and findings!', 'success');
+      } else {
+        // Fallback or development mode: show load modal on launch
+        openModal();
+      }
+    });
+  </script>
+</body>
+</html>
