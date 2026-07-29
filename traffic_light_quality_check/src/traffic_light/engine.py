@@ -1,9 +1,9 @@
-from typing import List, Dict
+from typing import Iterable
 
 from .models import Task, Finding
 from .rules import QualityConfig, RULES
 
-def audit_task(task: Task, config: QualityConfig = None) -> List[Finding]:
+def audit_task(task: Task, config: QualityConfig = None) -> list[Finding]:
     """Runs all rules on a single task and returns findings."""
     if config is None:
         config = QualityConfig()
@@ -14,7 +14,7 @@ def audit_task(task: Task, config: QualityConfig = None) -> List[Finding]:
 
     return findings
 
-def audit_tasks(tasks: List[Task], config: QualityConfig = None) -> Dict[str, List[Finding]]:
+def audit_tasks(tasks: Iterable[Task], config: QualityConfig = None) -> dict[str, list[Finding]]:
     """Runs all rules on a list of tasks and groups findings by task_id."""
     return {
         task.id: audit_task(task, config)

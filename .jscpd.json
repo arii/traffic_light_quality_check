@@ -13,6 +13,8 @@
     "**/*.test.tsx",
     "**/pnpm-lock.yaml",
     ".agents/**",
+    "**/results/*.json",
+    "**/test_out.json"
     "**/*.md",
     "**/traffic_light_quality_check/**/*.json"
   ],
