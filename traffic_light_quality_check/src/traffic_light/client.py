@@ -1,4 +1,5 @@
 import json
+import logging
 import urllib.request
 import urllib.error
 import urllib.parse
@@ -6,6 +7,10 @@ import os
 from typing import List, Dict, Any
 
 from .models import Task, Annotation, BoundingBox
+
+DEFAULT_IMAGE_WIDTH = 2000
+DEFAULT_IMAGE_HEIGHT = 2000
+
 
 def normalize_task(raw_task: Dict[str, Any]) -> Task:
     """Converts a raw Scale API task dictionary into the internal Task model."""
@@ -21,8 +26,8 @@ def normalize_task(raw_task: Dict[str, Any]) -> Task:
     # In some real-world data, they are provided inside params or metadata.
     # We will set a default large dimension to prevent division by zero, and allow out-of-bounds to just test zero bound.
     # For a real integration, we might need to fetch the image and get size.
-    image_width = params.get("image_width", 2000)
-    image_height = params.get("image_height", 2000)
+    image_width = params.get("image_width", DEFAULT_IMAGE_WIDTH)
+    image_height = params.get("image_height", DEFAULT_IMAGE_HEIGHT)
 
     annotations = []
 
@@ -77,12 +82,14 @@ class ScaleClient:
                 data = json.load(f)
                 if isinstance(data, list):
                     return data
-                elif "docs" in data:
+                elif isinstance(data, dict) and "docs" in data:
                     return data["docs"]
-                elif "tasks" in data:
+                elif isinstance(data, dict) and "tasks" in data:
                     return data["tasks"]
-                return [data]
+                raise ValueError("Invalid file format. Expected a list of tasks or a dict with 'docs' or 'tasks' keys.")
         elif project_id:
+             if not self.api_key:
+                 raise ValueError("SCALE_API_KEY environment variable or api_key argument is required when fetching by project_id")
              import base64
              auth_str = f"{self.api_key}:"
              b64_auth = base64.b64encode(auth_str.encode('utf-8')).decode('utf-8')
@@ -95,7 +102,7 @@ class ScaleClient:
                      data = json.loads(response.read().decode('utf-8'))
                      return data.get("docs", [])
              except urllib.error.URLError as e:
-                 print(f"Error fetching from Scale API: {e}")
+                 logging.error(f"Error fetching from Scale API: {e}")
                  return []
         else:
              return []

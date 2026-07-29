@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Dict, Any, List
+from typing import Dict, Any, List
 
 @dataclass
 class BoundingBox:
@@ -33,5 +33,5 @@ class Finding:
     category: str
     message: str
     task_id: str
-    annotation_id: Optional[str] = None
-    evidence: Optional[Dict[str, Any]] = None
+    annotation_id: str | None = None
+    evidence: Dict[str, Any] | None = None
