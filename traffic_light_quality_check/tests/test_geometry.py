@@ -1,5 +1,5 @@
 from traffic_light.models import BoundingBox
-from traffic_light.geometry import box_area, box_area_ratio, intersection_area, intersection_over_union, containment_ratio, is_out_of_bounds
+from traffic_light.rules import box_area, box_area_ratio, intersection_area, intersection_over_union, containment_ratio, is_out_of_bounds
 
 def test_box_area():
     box = BoundingBox(0, 0, 10, 10)

@@ -1,6 +1,5 @@
 from traffic_light.models import Task, Annotation, BoundingBox
-from traffic_light.engine import audit_task
-from traffic_light.rules import QualityConfig
+from traffic_light.rules import audit_task, QualityConfig
 
 def test_engine_valid_task():
     ann = Annotation(id="1", label="traffic_control_sign", box=BoundingBox(10, 10, 50, 50), attributes={"background_color": "white"})
