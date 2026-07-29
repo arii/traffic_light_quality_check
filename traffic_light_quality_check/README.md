@@ -18,7 +18,7 @@ The checks cover:
 * ObserveSign-specific annotation consistency
 * Severity and evidence for each finding
 
-The implementation is designed to operate on the project as a whole rather than being hard-coded to the sample tasks.
+The implementation is designed to operate on the project as a whole rather than being hard-coded to the sample tasks. The tool is parameterized by project_id so it generalizes across ObserveSign's pipeline without picking up unrelated test data in the shared account.
 
 ## Run
 
