@@ -514,10 +514,17 @@
           else if (hasWarning && state.layers.findings) bgStyle = '#f59e0b';
           if (isSelected) bgStyle = '#3b82f6';
 
+          let textColor = '#ffffff';
+
+          if (isHovered && !isSelected) {
+             bgStyle = '#ffffff';
+             textColor = '#0f172a'; // slate-900
+          }
+
           ctx.fillStyle = bgStyle;
           ctx.fillRect(box.left, Math.max(0, box.top - 20), textWidth + 8, 20);
 
-          ctx.fillStyle = '#ffffff';
+          ctx.fillStyle = textColor;
           ctx.fillText(labelStr, box.left + 4, Math.max(14, box.top - 5));
           ctx.restore();
         }
@@ -1097,6 +1104,43 @@
       return { x, y };
     }
 
+    function isPointInAnnotation(x, y, ann) {
+      const coords = getBoxCoords(ann);
+
+      // Check bounding box
+      if (x >= coords.left && x <= coords.left + coords.width && y >= coords.top && y <= coords.top + coords.height) {
+        return true;
+      }
+
+      // Check label/attribute rect if layers are enabled
+      if (state.layers.labels) {
+        ctx.save();
+        const fontSize = Math.max(11, Math.min(16, coords.height * 0.35 || 13));
+        ctx.font = `600 ${fontSize}px Inter, sans-serif`;
+
+        let attrText = '';
+        if (ann.attributes) {
+          const keys = Object.keys(ann.attributes);
+          if (keys.length > 0) {
+            attrText = ` [${ann.attributes[keys[0]]}]`;
+          }
+        }
+
+        const labelStr = `${ann.label || 'Object'}${attrText}`;
+        const textWidth = ctx.measureText(labelStr).width;
+        ctx.restore();
+
+        const labelTop = Math.max(0, coords.top - 20);
+        const labelHeight = 20;
+
+        if (x >= coords.left && x <= coords.left + textWidth + 8 && y >= labelTop && y <= labelTop + labelHeight) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
     // Canvas click to select a box
     viewport.addEventListener('click', (e) => {
       if (state.isDragging) return; // ignore clicks if dragging
@@ -1109,9 +1153,7 @@
       // Find bounding box that contains the clicked point (checking from top-most, reverse list order)
       let foundIndex = -1;
       for (let i = annotations.length - 1; i >= 0; i--) {
-        const coords = getBoxCoords(annotations[i]);
-        if (clickCoords.x >= coords.left && clickCoords.x <= coords.left + coords.width &&
-            clickCoords.y >= coords.top && clickCoords.y <= coords.top + coords.height) {
+        if (isPointInAnnotation(clickCoords.x, clickCoords.y, annotations[i])) {
           foundIndex = i;
           break;
         }
@@ -1153,9 +1195,7 @@
 
       let foundIndex = -1;
       for (let i = annotations.length - 1; i >= 0; i--) {
-        const coords = getBoxCoords(annotations[i]);
-        if (hoverCoords.x >= coords.left && hoverCoords.x <= coords.left + coords.width &&
-            hoverCoords.y >= coords.top && hoverCoords.y <= coords.top + coords.height) {
+        if (isPointInAnnotation(hoverCoords.x, hoverCoords.y, annotations[i])) {
           foundIndex = i;
           break;
         }
