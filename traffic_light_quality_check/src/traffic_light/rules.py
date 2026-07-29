@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Set, Dict
+from collections.abc import Iterable
 
 from .models import Task, Finding, Annotation
 from . import geometry
@@ -34,7 +34,7 @@ class QualityConfig:
     extreme_aspect_ratio_min: float = 0.1
 
 
-def check_invalid_labels(task: Task, config: QualityConfig) -> List[Finding]:
+def check_invalid_labels(task: Task, config: QualityConfig) -> list[Finding]:
     findings = []
     for ann in task.annotations:
         if ann.label not in config.valid_labels:
@@ -50,7 +50,7 @@ def check_invalid_labels(task: Task, config: QualityConfig) -> List[Finding]:
     return findings
 
 
-def check_invalid_attributes(task: Task, config: QualityConfig) -> List[Finding]:
+def check_invalid_attributes(task: Task, config: QualityConfig) -> list[Finding]:
     findings = []
     for ann in task.annotations:
         for attr_key, attr_val in ann.attributes.items():
@@ -97,7 +97,7 @@ def check_invalid_attributes(task: Task, config: QualityConfig) -> List[Finding]
     return findings
 
 
-def check_out_of_bounds(task: Task, config: QualityConfig) -> List[Finding]:
+def check_out_of_bounds(task: Task, config: QualityConfig) -> list[Finding]:
     findings = []
     if task.image_width is None or task.image_height is None:
         return findings
@@ -118,7 +118,7 @@ def check_out_of_bounds(task: Task, config: QualityConfig) -> List[Finding]:
     return findings
 
 
-def check_micro_boxes(task: Task, config: QualityConfig) -> List[Finding]:
+def check_micro_boxes(task: Task, config: QualityConfig) -> list[Finding]:
     findings = []
     for ann in task.annotations:
         area = geometry.box_area(ann.box)
@@ -137,7 +137,7 @@ def check_micro_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     return findings
 
 
-def check_giant_boxes(task: Task, config: QualityConfig) -> List[Finding]:
+def check_giant_boxes(task: Task, config: QualityConfig) -> list[Finding]:
     findings = []
     if task.image_width is None or task.image_height is None:
         return findings
@@ -156,7 +156,7 @@ def check_giant_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     return findings
 
 
-def check_extreme_aspect_ratio(task: Task, config: QualityConfig) -> List[Finding]:
+def check_extreme_aspect_ratio(task: Task, config: QualityConfig) -> list[Finding]:
     findings = []
     for ann in task.annotations:
         ratio = geometry.aspect_ratio(ann.box)
@@ -173,7 +173,7 @@ def check_extreme_aspect_ratio(task: Task, config: QualityConfig) -> List[Findin
     return findings
 
 
-def check_duplicate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
+def check_duplicate_boxes(task: Task, config: QualityConfig) -> list[Finding]:
     findings = []
     for i in range(len(task.annotations)):
         for j in range(i + 1, len(task.annotations)):
@@ -193,7 +193,7 @@ def check_duplicate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     return findings
 
 
-def check_suspicious_containment(task: Task, config: QualityConfig) -> List[Finding]:
+def check_suspicious_containment(task: Task, config: QualityConfig) -> list[Finding]:
     findings = []
     for i in range(len(task.annotations)):
         for j in range(len(task.annotations)):
@@ -202,7 +202,6 @@ def check_suspicious_containment(task: Task, config: QualityConfig) -> List[Find
             inner = task.annotations[i]
             outer = task.annotations[j]
             containment = geometry.containment_ratio(inner.box, outer.box)
-            # Check if inner is fully contained in outer, but not a duplicate (IoU might be small)
             iou = geometry.intersection_over_union(inner.box, outer.box)
             if containment > config.suspicious_containment_ratio and iou < config.duplicate_iou:
                 findings.append(Finding(
@@ -227,3 +226,21 @@ RULES = [
     check_duplicate_boxes,
     check_suspicious_containment,
 ]
+
+
+def audit_task(task: Task, config: QualityConfig = None) -> list[Finding]:
+    if config is None:
+        config = QualityConfig()
+
+    findings = []
+    for rule in RULES:
+        findings.extend(rule(task, config))
+
+    return findings
+
+
+def audit_tasks(tasks: Iterable[Task], config: QualityConfig = None) -> dict[str, list[Finding]]:
+    return {
+        task.id: audit_task(task, config)
+        for task in tasks
+    }

@@ -7,7 +7,8 @@ from traffic_light.rules import (
     check_micro_boxes,
     check_giant_boxes,
     check_duplicate_boxes,
-    check_suspicious_containment
+    check_suspicious_containment,
+    audit_task
 )
 
 config = QualityConfig()
@@ -66,3 +67,19 @@ def test_suspicious_containment():
     assert len(findings) == 1
     assert findings[0].rule_id == "OVL-002"
     assert findings[0].annotation_id == "2"
+
+def test_engine_valid_task():
+    ann = Annotation(id="1", label="traffic_control_sign", box=BoundingBox(10, 10, 50, 50), attributes={"background_color": "white"})
+    task = Task(id="t1", image_url="", image_width=1000, image_height=1000, annotations=[ann])
+    findings = audit_task(task)
+    assert len(findings) == 0
+
+def test_engine_multiple_findings():
+    # Out of bounds AND invalid label
+    ann = Annotation(id="1", label="invalid_label", box=BoundingBox(-10, 10, 50, 50), attributes={})
+    task = Task(id="t1", image_url="", image_width=1000, image_height=1000, annotations=[ann])
+    findings = audit_task(task)
+    assert len(findings) == 2
+    rule_ids = [f.rule_id for f in findings]
+    assert "TAX-001" in rule_ids
+    assert "GEO-001" in rule_ids
