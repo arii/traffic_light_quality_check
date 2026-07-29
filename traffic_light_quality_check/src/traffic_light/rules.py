@@ -153,7 +153,7 @@ def check_out_of_bounds(task: Task, config: QualityConfig) -> List[Finding]:
 def check_degenerate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
-        if ann.box.width <= 0.0 or ann.box.height <= 0.0:
+        if geometry.is_degenerate(ann.box):
             findings.append(Finding(
                 rule_id="GEO-005",
                 severity="error",
@@ -169,7 +169,7 @@ def check_degenerate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
 def check_micro_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
-        if ann.box.width <= 0.0 or ann.box.height <= 0.0:
+        if geometry.is_degenerate(ann.box):
             continue
         area = geometry.box_area(ann.box)
         if ann.box.width < config.micro_box_width or \
@@ -209,7 +209,7 @@ def check_giant_boxes(task: Task, config: QualityConfig) -> List[Finding]:
 def check_extreme_aspect_ratio(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
-        if ann.box.width <= 0.0 or ann.box.height <= 0.0:
+        if geometry.is_degenerate(ann.box):
             continue
         ratio = geometry.aspect_ratio(ann.box)
         if ratio > config.extreme_aspect_ratio_max or ratio < config.extreme_aspect_ratio_min:
