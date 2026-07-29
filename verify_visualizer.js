@@ -14,7 +14,7 @@ const path = require('path');
 
   const reportPath = path.resolve('traffic_light_quality_check/results/report_output.html');
   const fileUrl = `file://${reportPath}`;
-  console.log(`Opening visualizer report at {fileUrl}`);
+  console.log(`Opening visualizer report at ${fileUrl}`);
 
   await page.goto(fileUrl);
   await page.waitForTimeout(1500);
