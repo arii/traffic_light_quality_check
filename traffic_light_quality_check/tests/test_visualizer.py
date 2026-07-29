@@ -2,7 +2,7 @@ import os
 import json
 import tempfile
 from unittest.mock import patch
-from traffic_light.__main__ import main
+from traffic_light.cli import main
 
 def test_html_report_generation():
     # Setup mock tasks data with an invalid label to trigger a finding

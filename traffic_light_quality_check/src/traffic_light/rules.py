@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from collections.abc import Iterable
+from typing import List, Set, Dict
 
 from .models import Task, Finding, Annotation
 from . import geometry
@@ -34,36 +34,68 @@ class QualityConfig:
     extreme_aspect_ratio_min: float = 0.1
 
 
-def check_invalid_labels(task: Task, config: QualityConfig) -> list[Finding]:
+def is_legacy_label(label: str) -> bool:
+    l = label.lower()
+    return "traffic_light" in l or "traffic light" in l or "stoplight" in l
+
+
+def is_legacy_attribute_key(key: str) -> bool:
+    k = key.lower()
+    return "traffic_light" in k or k in {"light_status", "color", "light_state", "state"}
+
+
+def check_invalid_labels(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
         if ann.label not in config.valid_labels:
-            findings.append(Finding(
-                rule_id="TAX-001",
-                severity="error",
-                category="taxonomy",
-                message=f"Invalid label '{ann.label}'.",
-                task_id=task.id,
-                annotation_id=ann.id,
-                evidence={"label": ann.label}
-            ))
+            if is_legacy_label(ann.label):
+                findings.append(Finding(
+                    rule_id="TAX-001",
+                    severity="warning",
+                    category="taxonomy",
+                    message=f"Legacy traffic light label '{ann.label}' is deprecated. Please align with the current taxonomy.",
+                    task_id=task.id,
+                    annotation_id=ann.id,
+                    evidence={"label": ann.label}
+                ))
+            else:
+                findings.append(Finding(
+                    rule_id="TAX-001",
+                    severity="error",
+                    category="taxonomy",
+                    message=f"Invalid label '{ann.label}'.",
+                    task_id=task.id,
+                    annotation_id=ann.id,
+                    evidence={"label": ann.label}
+                ))
     return findings
 
 
-def check_invalid_attributes(task: Task, config: QualityConfig) -> list[Finding]:
+def check_invalid_attributes(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
         for attr_key, attr_val in ann.attributes.items():
             if attr_key not in config.valid_attributes:
-                findings.append(Finding(
-                    rule_id="TAX-002",
-                    severity="error",
-                    category="taxonomy",
-                    message=f"Invalid attribute key '{attr_key}'.",
-                    task_id=task.id,
-                    annotation_id=ann.id,
-                    evidence={"attribute": attr_key}
-                ))
+                if is_legacy_attribute_key(attr_key):
+                    findings.append(Finding(
+                        rule_id="TAX-002",
+                        severity="warning",
+                        category="taxonomy",
+                        message=f"Legacy traffic light attribute '{attr_key}' is deprecated. Please align with the current taxonomy.",
+                        task_id=task.id,
+                        annotation_id=ann.id,
+                        evidence={"attribute": attr_key}
+                    ))
+                else:
+                    findings.append(Finding(
+                        rule_id="TAX-002",
+                        severity="error",
+                        category="taxonomy",
+                        message=f"Invalid attribute key '{attr_key}'.",
+                        task_id=task.id,
+                        annotation_id=ann.id,
+                        evidence={"attribute": attr_key}
+                    ))
             elif attr_key == "occlusion" and attr_val not in config.valid_occlusion:
                 findings.append(Finding(
                     rule_id="TAX-002",
@@ -97,7 +129,7 @@ def check_invalid_attributes(task: Task, config: QualityConfig) -> list[Finding]
     return findings
 
 
-def check_out_of_bounds(task: Task, config: QualityConfig) -> list[Finding]:
+def check_out_of_bounds(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     if task.image_width is None or task.image_height is None:
         return findings
@@ -118,9 +150,27 @@ def check_out_of_bounds(task: Task, config: QualityConfig) -> list[Finding]:
     return findings
 
 
-def check_micro_boxes(task: Task, config: QualityConfig) -> list[Finding]:
+def check_degenerate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
+        if geometry.is_degenerate(ann.box):
+            findings.append(Finding(
+                rule_id="GEO-005",
+                severity="error",
+                category="geometry",
+                message="Bounding box has zero width or height.",
+                task_id=task.id,
+                annotation_id=ann.id,
+                evidence={"width": ann.box.width, "height": ann.box.height}
+            ))
+    return findings
+
+
+def check_micro_boxes(task: Task, config: QualityConfig) -> List[Finding]:
+    findings = []
+    for ann in task.annotations:
+        if geometry.is_degenerate(ann.box):
+            continue
         area = geometry.box_area(ann.box)
         if ann.box.width < config.micro_box_width or \
            ann.box.height < config.micro_box_height or \
@@ -137,7 +187,7 @@ def check_micro_boxes(task: Task, config: QualityConfig) -> list[Finding]:
     return findings
 
 
-def check_giant_boxes(task: Task, config: QualityConfig) -> list[Finding]:
+def check_giant_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     if task.image_width is None or task.image_height is None:
         return findings
@@ -156,9 +206,11 @@ def check_giant_boxes(task: Task, config: QualityConfig) -> list[Finding]:
     return findings
 
 
-def check_extreme_aspect_ratio(task: Task, config: QualityConfig) -> list[Finding]:
+def check_extreme_aspect_ratio(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
+        if geometry.is_degenerate(ann.box):
+            continue
         ratio = geometry.aspect_ratio(ann.box)
         if ratio > config.extreme_aspect_ratio_max or ratio < config.extreme_aspect_ratio_min:
             findings.append(Finding(
@@ -173,7 +225,7 @@ def check_extreme_aspect_ratio(task: Task, config: QualityConfig) -> list[Findin
     return findings
 
 
-def check_duplicate_boxes(task: Task, config: QualityConfig) -> list[Finding]:
+def check_duplicate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for i in range(len(task.annotations)):
         for j in range(i + 1, len(task.annotations)):
@@ -193,7 +245,7 @@ def check_duplicate_boxes(task: Task, config: QualityConfig) -> list[Finding]:
     return findings
 
 
-def check_suspicious_containment(task: Task, config: QualityConfig) -> list[Finding]:
+def check_suspicious_containment(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for i in range(len(task.annotations)):
         for j in range(len(task.annotations)):
@@ -202,6 +254,7 @@ def check_suspicious_containment(task: Task, config: QualityConfig) -> list[Find
             inner = task.annotations[i]
             outer = task.annotations[j]
             containment = geometry.containment_ratio(inner.box, outer.box)
+            # Check if inner is fully contained in outer, but not a duplicate (IoU might be small)
             iou = geometry.intersection_over_union(inner.box, outer.box)
             if containment > config.suspicious_containment_ratio and iou < config.duplicate_iou:
                 findings.append(Finding(
@@ -220,27 +273,10 @@ RULES = [
     check_invalid_labels,
     check_invalid_attributes,
     check_out_of_bounds,
+    check_degenerate_boxes,
     check_micro_boxes,
     check_giant_boxes,
     check_extreme_aspect_ratio,
     check_duplicate_boxes,
     check_suspicious_containment,
 ]
-
-
-def audit_task(task: Task, config: QualityConfig = None) -> list[Finding]:
-    if config is None:
-        config = QualityConfig()
-
-    findings = []
-    for rule in RULES:
-        findings.extend(rule(task, config))
-
-    return findings
-
-
-def audit_tasks(tasks: Iterable[Task], config: QualityConfig = None) -> dict[str, list[Finding]]:
-    return {
-        task.id: audit_task(task, config)
-        for task in tasks
-    }
