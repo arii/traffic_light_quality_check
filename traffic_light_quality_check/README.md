@@ -24,21 +24,21 @@ This is only required when running against the live Scale API (i.e. without `--f
 
 ### Running the CLI
 
-**From a pre-collected JSON file** (scoped to the target project):
-```bash
-PYTHONPATH=src python3 -m traffic_light \
-  --file output.json \
-  --output results/audit.json \
-  --html results/report_output.html \
-  --project-id 5f124e5671c7b700170a16fb
-```
-
-**Directly from the Scale API** (live, requires `SCALE_API_KEY` in `.env`):
+**From the Scale API** (primary — requires `SCALE_API_KEY` in `.env`):
 ```bash
 PYTHONPATH=src python3 -m traffic_light \
   --project-id 5f124e5671c7b700170a16fb \
   --output results/audit.json \
   --html results/report_output.html
+```
+
+**From a local JSON dump** (offline fallback — pass any file exported from Scale):
+```bash
+PYTHONPATH=src python3 -m traffic_light \
+  --file /path/to/output.json \
+  --output results/audit.json \
+  --html results/report_output.html \
+  --project-id 5f124e5671c7b700170a16fb
 ```
 
 ### Output
