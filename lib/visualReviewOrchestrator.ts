@@ -154,7 +154,11 @@ export async function orchestrateVisualReview(
   }
 
   // Post to GitHub PR
-  await postPRComment(report, client.reportTitle, state);
+  try {
+    await postPRComment(report, client.reportTitle, state);
+  } catch (e) {
+    console.warn('⚠️ Failed to post or update PR comment:', e);
+  }
 
   // Write a structured result file alongside the markdown
   const hasBlockingIssues = reviews.some(r =>
