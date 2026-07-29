@@ -111,9 +111,19 @@ class ScaleClient:
         elif project_id:
              if not self.api_key:
                  raise ValueError("SCALE_API_KEY environment variable or api_key argument is required when fetching by project_id")
-             url = f"{self.base_url}/tasks"
-             params = {"project": project_id}
-             headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+             import base64
+             auth_str = f"{self.api_key}:"
+             b64_auth = base64.b64encode(auth_str.encode('utf-8')).decode('utf-8')
+             
+             # Scale API uses 'project' for project name and 'project_id' for project hex ID.
+             # A 24-character hex string indicates a project_id.
+             is_hex_id = len(project_id) == 24 and all(c in "0123456789abcdefABCDEF" for c in project_id)
+             param_key = "project_id" if is_hex_id else "project"
+             
+             url = f"{self.base_url}/tasks?{param_key}={urllib.parse.quote(project_id)}"
+             req = urllib.request.Request(url)
+             req.add_header("Authorization", f"Basic {b64_auth}")
+             req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
              try:
                  response = requests.get(url, params=params, headers=headers, auth=(self.api_key, ""))
                  response.raise_for_status()
