@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Iterable, List
 
 from . import geometry
-from .models import Annotation, Finding, Task
+from .models import Finding, Task
 
 @dataclass(frozen=True)
 class QualityConfig:
