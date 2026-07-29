@@ -64,3 +64,57 @@ def test_suspicious_containment():
     assert len(findings) == 1
     assert findings[0].rule_id == "OVL-002"
     assert findings[0].annotation_id == "2"
+
+
+def test_legacy_label_warning():
+    # Legacy label "Traffic lights" should be warning
+    ann_legacy = Annotation(id="1", label="Traffic lights", box=BoundingBox(10, 10, 50, 50), attributes={})
+    task = Task(id="t1", image_url="", image_width=1000, image_height=1000, annotations=[ann_legacy])
+    findings = check_invalid_labels(task, config)
+    assert len(findings) == 1
+    assert findings[0].rule_id == "TAX-001"
+    assert findings[0].severity == "warning"
+    assert "deprecated" in findings[0].message
+
+    # Legacy label "stoplight" should be warning
+    ann_legacy2 = Annotation(id="2", label="stoplight", box=BoundingBox(10, 10, 50, 50), attributes={})
+    task2 = Task(id="t2", image_url="", image_width=1000, image_height=1000, annotations=[ann_legacy2])
+    findings2 = check_invalid_labels(task2, config)
+    assert len(findings2) == 1
+    assert findings2[0].rule_id == "TAX-001"
+    assert findings2[0].severity == "warning"
+
+    # Completely invalid non-legacy label should be error
+    ann_invalid = Annotation(id="3", label="completely_invalid_label", box=BoundingBox(10, 10, 50, 50), attributes={})
+    task3 = Task(id="t3", image_url="", image_width=1000, image_height=1000, annotations=[ann_invalid])
+    findings3 = check_invalid_labels(task3, config)
+    assert len(findings3) == 1
+    assert findings3[0].rule_id == "TAX-001"
+    assert findings3[0].severity == "error"
+
+
+def test_legacy_attribute_warning():
+    # Legacy attribute "traffic_light_status" should be warning
+    ann_legacy = Annotation(id="1", label="traffic_control_sign", box=BoundingBox(10, 10, 50, 50), attributes={"traffic_light_status": "Green"})
+    task = Task(id="t1", image_url="", image_width=1000, image_height=1000, annotations=[ann_legacy])
+    findings = check_invalid_attributes(task, config)
+    assert len(findings) == 1
+    assert findings[0].rule_id == "TAX-002"
+    assert findings[0].severity == "warning"
+    assert "deprecated" in findings[0].message
+
+    # Legacy attribute "Color" should be warning
+    ann_legacy2 = Annotation(id="2", label="traffic_control_sign", box=BoundingBox(10, 10, 50, 50), attributes={"Color": "red"})
+    task2 = Task(id="t2", image_url="", image_width=1000, image_height=1000, annotations=[ann_legacy2])
+    findings2 = check_invalid_attributes(task2, config)
+    assert len(findings2) == 1
+    assert findings2[0].rule_id == "TAX-002"
+    assert findings2[0].severity == "warning"
+
+    # Completely invalid non-legacy attribute should be error
+    ann_invalid = Annotation(id="3", label="traffic_control_sign", box=BoundingBox(10, 10, 50, 50), attributes={"some_weird_attr": "value"})
+    task3 = Task(id="t3", image_url="", image_width=1000, image_height=1000, annotations=[ann_invalid])
+    findings3 = check_invalid_attributes(task3, config)
+    assert len(findings3) == 1
+    assert findings3[0].rule_id == "TAX-002"
+    assert findings3[0].severity == "error"

@@ -34,19 +34,40 @@ class QualityConfig:
     extreme_aspect_ratio_min: float = 0.1
 
 
+def is_legacy_label(label: str) -> bool:
+    l = label.lower()
+    return "traffic_light" in l or "traffic light" in l or "stoplight" in l
+
+
+def is_legacy_attribute_key(key: str) -> bool:
+    k = key.lower()
+    return "traffic_light" in k or k in {"light_status", "color", "light_state", "state"}
+
+
 def check_invalid_labels(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
         if ann.label not in config.valid_labels:
-            findings.append(Finding(
-                rule_id="TAX-001",
-                severity="error",
-                category="taxonomy",
-                message=f"Invalid label '{ann.label}'.",
-                task_id=task.id,
-                annotation_id=ann.id,
-                evidence={"label": ann.label}
-            ))
+            if is_legacy_label(ann.label):
+                findings.append(Finding(
+                    rule_id="TAX-001",
+                    severity="warning",
+                    category="taxonomy",
+                    message=f"Legacy traffic light label '{ann.label}' is deprecated. Please align with the current taxonomy.",
+                    task_id=task.id,
+                    annotation_id=ann.id,
+                    evidence={"label": ann.label}
+                ))
+            else:
+                findings.append(Finding(
+                    rule_id="TAX-001",
+                    severity="error",
+                    category="taxonomy",
+                    message=f"Invalid label '{ann.label}'.",
+                    task_id=task.id,
+                    annotation_id=ann.id,
+                    evidence={"label": ann.label}
+                ))
     return findings
 
 
@@ -55,15 +76,26 @@ def check_invalid_attributes(task: Task, config: QualityConfig) -> List[Finding]
     for ann in task.annotations:
         for attr_key, attr_val in ann.attributes.items():
             if attr_key not in config.valid_attributes:
-                findings.append(Finding(
-                    rule_id="TAX-002",
-                    severity="error",
-                    category="taxonomy",
-                    message=f"Invalid attribute key '{attr_key}'.",
-                    task_id=task.id,
-                    annotation_id=ann.id,
-                    evidence={"attribute": attr_key}
-                ))
+                if is_legacy_attribute_key(attr_key):
+                    findings.append(Finding(
+                        rule_id="TAX-002",
+                        severity="warning",
+                        category="taxonomy",
+                        message=f"Legacy traffic light attribute '{attr_key}' is deprecated. Please align with the current taxonomy.",
+                        task_id=task.id,
+                        annotation_id=ann.id,
+                        evidence={"attribute": attr_key}
+                    ))
+                else:
+                    findings.append(Finding(
+                        rule_id="TAX-002",
+                        severity="error",
+                        category="taxonomy",
+                        message=f"Invalid attribute key '{attr_key}'.",
+                        task_id=task.id,
+                        annotation_id=ann.id,
+                        evidence={"attribute": attr_key}
+                    ))
             elif attr_key == "occlusion" and attr_val not in config.valid_occlusion:
                 findings.append(Finding(
                     rule_id="TAX-002",
