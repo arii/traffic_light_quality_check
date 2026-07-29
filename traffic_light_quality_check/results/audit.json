@@ -2,10 +2,10 @@
   {
     "task_id": "6526eb2365f4f43fdc857211",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "84c31b07-73b6-4832-9adf-34936a424a9b",
-    "message": "Invalid label 'Traffic lights'.",
+    "message": "Legacy traffic light label 'Traffic lights' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic lights"
     }
@@ -13,10 +13,10 @@
   {
     "task_id": "6526eb2365f4f43fdc857211",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "53650a92-bf7e-483f-a087-ea3bd6c88d5f",
-    "message": "Invalid label 'Traffic lights'.",
+    "message": "Legacy traffic light label 'Traffic lights' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic lights"
     }
@@ -24,10 +24,10 @@
   {
     "task_id": "6526eb2365f4f43fdc857211",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "09d90861-a82b-460f-ba1f-af198740f8a5",
-    "message": "Invalid label 'Traffic lights'.",
+    "message": "Legacy traffic light label 'Traffic lights' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic lights"
     }
@@ -35,10 +35,10 @@
   {
     "task_id": "6526eb2365f4f43fdc857211",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "d045c8d5-70ba-49cf-b785-a2d08f1449cf",
-    "message": "Invalid label 'Traffic lights'.",
+    "message": "Legacy traffic light label 'Traffic lights' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic lights"
     }
@@ -46,10 +46,10 @@
   {
     "task_id": "6526eb2365f4f43fdc857211",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "84c31b07-73b6-4832-9adf-34936a424a9b",
-    "message": "Invalid attribute key 'traffic_light_status'.",
+    "message": "Legacy traffic light attribute 'traffic_light_status' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_status"
     }
@@ -57,10 +57,10 @@
   {
     "task_id": "6526eb2365f4f43fdc857211",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "53650a92-bf7e-483f-a087-ea3bd6c88d5f",
-    "message": "Invalid attribute key 'traffic_light_status'.",
+    "message": "Legacy traffic light attribute 'traffic_light_status' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_status"
     }
@@ -68,10 +68,10 @@
   {
     "task_id": "6526eb2365f4f43fdc857211",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "09d90861-a82b-460f-ba1f-af198740f8a5",
-    "message": "Invalid attribute key 'traffic_light_status'.",
+    "message": "Legacy traffic light attribute 'traffic_light_status' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_status"
     }
@@ -79,10 +79,10 @@
   {
     "task_id": "6526eb2365f4f43fdc857211",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "d045c8d5-70ba-49cf-b785-a2d08f1449cf",
-    "message": "Invalid attribute key 'traffic_light_status'.",
+    "message": "Legacy traffic light attribute 'traffic_light_status' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_status"
     }
@@ -1464,10 +1464,10 @@
   {
     "task_id": "633dddece55ac50025991e7c",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "ec339734-612c-45b1-bc52-a09c7d108242",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -1475,10 +1475,10 @@
   {
     "task_id": "633dddece55ac50025991e7c",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "fa3d6ea5-5453-4a54-8045-875d9c399752",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -1486,10 +1486,10 @@
   {
     "task_id": "633dddece55ac50025991e7c",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "3b335db1-a671-46af-afe2-ccf159a857f0",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -1497,10 +1497,10 @@
   {
     "task_id": "633dddece55ac50025991e7c",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "2c3ac463-57be-4563-907b-13e195962f7a",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -1508,10 +1508,10 @@
   {
     "task_id": "633dddece55ac50025991e7c",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "ec339734-612c-45b1-bc52-a09c7d108242",
-    "message": "Invalid attribute key 'Color'.",
+    "message": "Legacy traffic light attribute 'Color' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "Color"
     }
@@ -1519,10 +1519,10 @@
   {
     "task_id": "633dddece55ac50025991e7c",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "fa3d6ea5-5453-4a54-8045-875d9c399752",
-    "message": "Invalid attribute key 'Color'.",
+    "message": "Legacy traffic light attribute 'Color' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "Color"
     }
@@ -1530,10 +1530,10 @@
   {
     "task_id": "633dddece55ac50025991e7c",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "3b335db1-a671-46af-afe2-ccf159a857f0",
-    "message": "Invalid attribute key 'Color'.",
+    "message": "Legacy traffic light attribute 'Color' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "Color"
     }
@@ -1541,10 +1541,10 @@
   {
     "task_id": "633dddece55ac50025991e7c",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "2c3ac463-57be-4563-907b-13e195962f7a",
-    "message": "Invalid attribute key 'Color'.",
+    "message": "Legacy traffic light attribute 'Color' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "Color"
     }
@@ -3390,10 +3390,10 @@
   {
     "task_id": "62b371777923760024633b50",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "ec36b5ee-7c59-4eb9-8ff8-a18aef15ba61",
-    "message": "Invalid label 'stoplight'.",
+    "message": "Legacy traffic light label 'stoplight' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "stoplight"
     }
@@ -3401,10 +3401,10 @@
   {
     "task_id": "62b371777923760024633b50",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "67c750bc-6f82-4efe-9ef9-8b62b39fd272",
-    "message": "Invalid label 'stoplight'.",
+    "message": "Legacy traffic light label 'stoplight' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "stoplight"
     }
@@ -3412,10 +3412,10 @@
   {
     "task_id": "62b371777923760024633b50",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "4b1a3cfa-0bd0-411e-8b62-b4628a4f7615",
-    "message": "Invalid label 'stoplight'.",
+    "message": "Legacy traffic light label 'stoplight' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "stoplight"
     }
@@ -3423,10 +3423,10 @@
   {
     "task_id": "62b371777923760024633b50",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "b7097751-4bb0-4541-88d9-672cb29281ab",
-    "message": "Invalid label 'stoplight'.",
+    "message": "Legacy traffic light label 'stoplight' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "stoplight"
     }
@@ -3434,10 +3434,10 @@
   {
     "task_id": "62b371777923760024633b50",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "ec36b5ee-7c59-4eb9-8ff8-a18aef15ba61",
-    "message": "Invalid attribute key 'traffic_light_state'.",
+    "message": "Legacy traffic light attribute 'traffic_light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_state"
     }
@@ -3445,10 +3445,10 @@
   {
     "task_id": "62b371777923760024633b50",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "67c750bc-6f82-4efe-9ef9-8b62b39fd272",
-    "message": "Invalid attribute key 'traffic_light_state'.",
+    "message": "Legacy traffic light attribute 'traffic_light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_state"
     }
@@ -3456,10 +3456,10 @@
   {
     "task_id": "62b371777923760024633b50",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "4b1a3cfa-0bd0-411e-8b62-b4628a4f7615",
-    "message": "Invalid attribute key 'traffic_light_state'.",
+    "message": "Legacy traffic light attribute 'traffic_light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_state"
     }
@@ -3467,10 +3467,10 @@
   {
     "task_id": "62b371777923760024633b50",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "b7097751-4bb0-4541-88d9-672cb29281ab",
-    "message": "Invalid attribute key 'traffic_light_state'.",
+    "message": "Legacy traffic light attribute 'traffic_light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_state"
     }
@@ -3538,10 +3538,10 @@
   {
     "task_id": "62b36ef4847b1e0011676ba3",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "3a866436-3745-4b48-949d-fab7c4518611",
-    "message": "Invalid label 'stoplight'.",
+    "message": "Legacy traffic light label 'stoplight' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "stoplight"
     }
@@ -3549,10 +3549,10 @@
   {
     "task_id": "62b36ef4847b1e0011676ba3",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "89e1e8b9-ada6-402e-9d2e-15216ae86a24",
-    "message": "Invalid label 'stoplight'.",
+    "message": "Legacy traffic light label 'stoplight' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "stoplight"
     }
@@ -3560,10 +3560,10 @@
   {
     "task_id": "62b36ef4847b1e0011676ba3",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "4ac8a0bb-4468-4d5e-a835-d4f0f5e593a9",
-    "message": "Invalid label 'stoplight'.",
+    "message": "Legacy traffic light label 'stoplight' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "stoplight"
     }
@@ -3571,10 +3571,10 @@
   {
     "task_id": "62b36ef4847b1e0011676ba3",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "419d818e-7b5f-4da0-b8f4-2015643060a5",
-    "message": "Invalid label 'stoplight'.",
+    "message": "Legacy traffic light label 'stoplight' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "stoplight"
     }
@@ -3642,10 +3642,10 @@
   {
     "task_id": "6297c17a13019c0017ecfd26",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "e175a330-4c9f-4234-9dab-41ec4e6c67a2",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -3653,10 +3653,10 @@
   {
     "task_id": "6297c17a13019c0017ecfd26",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "c37d5724-1016-463b-b071-3cf0de2c1428",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -3664,10 +3664,10 @@
   {
     "task_id": "6297c17a13019c0017ecfd26",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "a068e3fd-d5da-4f7b-99a5-34fdebd16d01",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -3675,10 +3675,10 @@
   {
     "task_id": "6297c17a13019c0017ecfd26",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "84510c37-2eff-430e-8c1e-aab6e9f317b4",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -3697,10 +3697,10 @@
   {
     "task_id": "6297c17a13019c0017ecfd26",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "e175a330-4c9f-4234-9dab-41ec4e6c67a2",
-    "message": "Invalid attribute key 'light_state'.",
+    "message": "Legacy traffic light attribute 'light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_state"
     }
@@ -3708,10 +3708,10 @@
   {
     "task_id": "6297c17a13019c0017ecfd26",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "c37d5724-1016-463b-b071-3cf0de2c1428",
-    "message": "Invalid attribute key 'light_state'.",
+    "message": "Legacy traffic light attribute 'light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_state"
     }
@@ -3719,10 +3719,10 @@
   {
     "task_id": "6297c17a13019c0017ecfd26",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "a068e3fd-d5da-4f7b-99a5-34fdebd16d01",
-    "message": "Invalid attribute key 'light_state'.",
+    "message": "Legacy traffic light attribute 'light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_state"
     }
@@ -3730,10 +3730,10 @@
   {
     "task_id": "6297c17a13019c0017ecfd26",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "84510c37-2eff-430e-8c1e-aab6e9f317b4",
-    "message": "Invalid attribute key 'light_state'.",
+    "message": "Legacy traffic light attribute 'light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_state"
     }
@@ -3832,10 +3832,10 @@
   {
     "task_id": "6297be703b4724002b969899",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "f317811e-6dae-4a70-9aca-8ca2477a08c3",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -3843,10 +3843,10 @@
   {
     "task_id": "6297be703b4724002b969899",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "392f7437-7fe8-4e31-ac5f-78a8c7025a37",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -3854,10 +3854,10 @@
   {
     "task_id": "6297be703b4724002b969899",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "a3764f46-ab55-4109-9ad7-42d03ffb1339",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -3865,10 +3865,10 @@
   {
     "task_id": "6297be703b4724002b969899",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "1155a8cf-8842-4813-8dd2-6845d619cadd",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -3876,10 +3876,10 @@
   {
     "task_id": "6297be703b4724002b969899",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "f317811e-6dae-4a70-9aca-8ca2477a08c3",
-    "message": "Invalid attribute key 'light_state'.",
+    "message": "Legacy traffic light attribute 'light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_state"
     }
@@ -3887,10 +3887,10 @@
   {
     "task_id": "6297be703b4724002b969899",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "392f7437-7fe8-4e31-ac5f-78a8c7025a37",
-    "message": "Invalid attribute key 'light_state'.",
+    "message": "Legacy traffic light attribute 'light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_state"
     }
@@ -3898,10 +3898,10 @@
   {
     "task_id": "6297be703b4724002b969899",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "a3764f46-ab55-4109-9ad7-42d03ffb1339",
-    "message": "Invalid attribute key 'light_state'.",
+    "message": "Legacy traffic light attribute 'light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_state"
     }
@@ -3909,10 +3909,10 @@
   {
     "task_id": "6297be703b4724002b969899",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "1155a8cf-8842-4813-8dd2-6845d619cadd",
-    "message": "Invalid attribute key 'light_state'.",
+    "message": "Legacy traffic light attribute 'light_state' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_state"
     }
@@ -3980,10 +3980,10 @@
   {
     "task_id": "6297bc6604b45c001156d153",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "a40fbf7c-b7c0-490d-876c-85a19c6dae4f",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -3991,10 +3991,10 @@
   {
     "task_id": "6297bc6604b45c001156d153",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "2f060b16-f49f-46b7-8f60-bd1e095e7654",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -4002,10 +4002,10 @@
   {
     "task_id": "6297bc6604b45c001156d153",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "3320c61f-9876-4bbb-93a0-fbb3862eb34d",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -4013,10 +4013,10 @@
   {
     "task_id": "6297bc6604b45c001156d153",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "7d76485e-57f4-4acb-a5a5-7b18d7dec187",
-    "message": "Invalid label 'Traffic Light'.",
+    "message": "Legacy traffic light label 'Traffic Light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Light"
     }
@@ -4084,10 +4084,10 @@
   {
     "task_id": "62757f9910268c0017517adf",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "b6f5bc94-b970-4f7f-bc6a-b8180dbb1e9e",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4095,10 +4095,10 @@
   {
     "task_id": "62757f9910268c0017517adf",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "0ac155e7-7baa-49af-91c2-b0a4f0ff869d",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4106,10 +4106,10 @@
   {
     "task_id": "62757f9910268c0017517adf",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "529499c9-0656-4ff8-8372-5836ec520f89",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4117,10 +4117,10 @@
   {
     "task_id": "62757f9910268c0017517adf",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "cb4ede1d-423f-458a-8428-af071534f26f",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4232,10 +4232,10 @@
   {
     "task_id": "62757d5cd8b5e6001d99a5fe",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "5d214bbc-795d-4201-a658-6757ffff22ff",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4243,10 +4243,10 @@
   {
     "task_id": "62757d5cd8b5e6001d99a5fe",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "09aace70-fcbb-4e34-8f91-8623e177d57a",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4254,10 +4254,10 @@
   {
     "task_id": "62757d5cd8b5e6001d99a5fe",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "90dbc947-bf72-49e3-8591-2f0816398ae9",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4265,10 +4265,10 @@
   {
     "task_id": "62757d5cd8b5e6001d99a5fe",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "dfcacdb2-61b0-4aea-ae39-565129388c48",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4336,10 +4336,10 @@
   {
     "task_id": "6250ca4a1d7df5002cdb8840",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "7cfa0418-4a5f-4cdd-90d7-3cdd36d3899f",
-    "message": "Invalid label 'Traffic Lights'.",
+    "message": "Legacy traffic light label 'Traffic Lights' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Lights"
     }
@@ -4347,10 +4347,10 @@
   {
     "task_id": "6250ca4a1d7df5002cdb8840",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "fc38c00f-f048-4bd8-ad02-b48031f5e9c0",
-    "message": "Invalid label 'Traffic Lights'.",
+    "message": "Legacy traffic light label 'Traffic Lights' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Lights"
     }
@@ -4358,10 +4358,10 @@
   {
     "task_id": "6250ca4a1d7df5002cdb8840",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "05229ec2-cbcf-41e8-b9ec-21e7d9988b17",
-    "message": "Invalid label 'Traffic Lights'.",
+    "message": "Legacy traffic light label 'Traffic Lights' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Lights"
     }
@@ -4369,10 +4369,10 @@
   {
     "task_id": "6250ca4a1d7df5002cdb8840",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "05423c58-78e0-4520-9879-e33032b1c8fa",
-    "message": "Invalid label 'Traffic Lights'.",
+    "message": "Legacy traffic light label 'Traffic Lights' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "Traffic Lights"
     }
@@ -4380,10 +4380,10 @@
   {
     "task_id": "6250ca4a1d7df5002cdb8840",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "7cfa0418-4a5f-4cdd-90d7-3cdd36d3899f",
-    "message": "Invalid attribute key 'traffic_light_color'.",
+    "message": "Legacy traffic light attribute 'traffic_light_color' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_color"
     }
@@ -4391,10 +4391,10 @@
   {
     "task_id": "6250ca4a1d7df5002cdb8840",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "fc38c00f-f048-4bd8-ad02-b48031f5e9c0",
-    "message": "Invalid attribute key 'traffic_light_color'.",
+    "message": "Legacy traffic light attribute 'traffic_light_color' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_color"
     }
@@ -4402,10 +4402,10 @@
   {
     "task_id": "6250ca4a1d7df5002cdb8840",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "05229ec2-cbcf-41e8-b9ec-21e7d9988b17",
-    "message": "Invalid attribute key 'traffic_light_color'.",
+    "message": "Legacy traffic light attribute 'traffic_light_color' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_color"
     }
@@ -4413,10 +4413,10 @@
   {
     "task_id": "6250ca4a1d7df5002cdb8840",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "05423c58-78e0-4520-9879-e33032b1c8fa",
-    "message": "Invalid attribute key 'traffic_light_color'.",
+    "message": "Legacy traffic light attribute 'traffic_light_color' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "traffic_light_color"
     }
@@ -4484,10 +4484,10 @@
   {
     "task_id": "6244b044a132000016ea1056",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "885cc960-849a-47f5-a694-22c4ac766ac0",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4495,10 +4495,10 @@
   {
     "task_id": "6244b044a132000016ea1056",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "61347261-4e4b-448b-b561-b3e8803d2b6e",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4506,10 +4506,10 @@
   {
     "task_id": "6244b044a132000016ea1056",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "1cbe4e81-380a-4b15-b595-f715e60af3d9",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4517,10 +4517,10 @@
   {
     "task_id": "6244b044a132000016ea1056",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "845b8ab6-0995-4816-a4c3-44356532d082",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4528,10 +4528,10 @@
   {
     "task_id": "6244b044a132000016ea1056",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "885cc960-849a-47f5-a694-22c4ac766ac0",
-    "message": "Invalid attribute key 'light_status'.",
+    "message": "Legacy traffic light attribute 'light_status' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_status"
     }
@@ -4545,6 +4545,17 @@
     "message": "Invalid attribute key 'crosswalk'.",
     "evidence": {
       "attribute": "crosswalk"
+    }
+  },
+  {
+    "task_id": "6244b044a132000016ea1056",
+    "rule_id": "TAX-002",
+    "severity": "warning",
+    "category": "taxonomy",
+    "annotation_id": "61347261-4e4b-448b-b561-b3e8803d2b6e",
+    "message": "Legacy traffic light attribute 'light_status' is deprecated. Please align with the current taxonomy.",
+    "evidence": {
+      "attribute": "light_status"
     }
   },
   {
@@ -4553,17 +4564,6 @@
     "severity": "error",
     "category": "taxonomy",
     "annotation_id": "61347261-4e4b-448b-b561-b3e8803d2b6e",
-    "message": "Invalid attribute key 'light_status'.",
-    "evidence": {
-      "attribute": "light_status"
-    }
-  },
-  {
-    "task_id": "6244b044a132000016ea1056",
-    "rule_id": "TAX-002",
-    "severity": "error",
-    "category": "taxonomy",
-    "annotation_id": "61347261-4e4b-448b-b561-b3e8803d2b6e",
     "message": "Invalid attribute key 'crosswalk'.",
     "evidence": {
       "attribute": "crosswalk"
@@ -4572,10 +4572,10 @@
   {
     "task_id": "6244b044a132000016ea1056",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "1cbe4e81-380a-4b15-b595-f715e60af3d9",
-    "message": "Invalid attribute key 'light_status'.",
+    "message": "Legacy traffic light attribute 'light_status' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_status"
     }
@@ -4594,10 +4594,10 @@
   {
     "task_id": "6244b044a132000016ea1056",
     "rule_id": "TAX-002",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "845b8ab6-0995-4816-a4c3-44356532d082",
-    "message": "Invalid attribute key 'light_status'.",
+    "message": "Legacy traffic light attribute 'light_status' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "attribute": "light_status"
     }
@@ -4676,10 +4676,10 @@
   {
     "task_id": "6244ab5bc3bc3c002c099579",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "02f35030-c1ee-4a65-955a-da6418aca4bc",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4687,10 +4687,10 @@
   {
     "task_id": "6244ab5bc3bc3c002c099579",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "59dfbe39-2007-40a2-a835-86954aad8e18",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4698,10 +4698,10 @@
   {
     "task_id": "6244ab5bc3bc3c002c099579",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "98b04436-1e70-407f-8c63-bdd84af7a622",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
@@ -4709,10 +4709,10 @@
   {
     "task_id": "6244ab5bc3bc3c002c099579",
     "rule_id": "TAX-001",
-    "severity": "error",
+    "severity": "warning",
     "category": "taxonomy",
     "annotation_id": "ed15432b-a873-472c-8b58-5adb394fe465",
-    "message": "Invalid label 'traffic light'.",
+    "message": "Legacy traffic light label 'traffic light' is deprecated. Please align with the current taxonomy.",
     "evidence": {
       "label": "traffic light"
     }
