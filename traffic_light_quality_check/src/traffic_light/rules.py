@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Iterable
 
 from .models import Task, Finding, Annotation
 from . import geometry
@@ -139,7 +139,7 @@ def check_out_of_bounds(task: Task, config: QualityConfig) -> List[Finding]:
                 rule_id="GEO-001",
                 severity="error",
                 category="geometry",
-                message="Bounding box is out of image bounds or touches the edges.",
+                message="Bounding box is out of image bounds.",
                 task_id=task.id,
                 annotation_id=ann.id,
                 evidence={
@@ -259,3 +259,21 @@ RULES = [
     check_duplicate_boxes,
     check_suspicious_containment,
 ]
+
+def audit_task(task: Task, config: QualityConfig = None) -> list[Finding]:
+    """Runs all rules on a single task and returns findings."""
+    if config is None:
+        config = QualityConfig()
+
+    findings = []
+    for rule in RULES:
+        findings.extend(rule(task, config))
+
+    return findings
+
+def audit_tasks(tasks: Iterable[Task], config: QualityConfig = None) -> dict[str, list[Finding]]:
+    """Runs all rules on a list of tasks and groups findings by task_id."""
+    return {
+        task.id: audit_task(task, config)
+        for task in tasks
+    }

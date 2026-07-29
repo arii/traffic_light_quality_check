@@ -5,20 +5,23 @@ from traffic_light.models import Task, Annotation, BoundingBox
 from traffic_light.rules import check_out_of_bounds, check_giant_boxes, QualityConfig
 
 def test_get_image_size_success():
-    # Mock urllib.request.urlopen to return an image-like object
+    # Mock requests.get to return a mock response
     mock_img = MagicMock()
     mock_img.size = (1920, 1080)
 
-    with patch("urllib.request.urlopen") as mock_urlopen, \
+    with patch("requests.get") as mock_get, \
          patch("PIL.Image.open") as mock_open:
+        mock_response = MagicMock()
+        mock_response.raw = MagicMock()
+        mock_get.return_value = mock_response
         mock_open.return_value.__enter__.return_value = mock_img
 
         size = get_image_size("http://example.com/test.jpg")
         assert size == (1920, 1080)
-        mock_urlopen.assert_called_once()
+        mock_get.assert_called_once()
 
 def test_get_image_size_failure():
-    with patch("urllib.request.urlopen", side_effect=Exception("Network error")):
+    with patch("requests.get", side_effect=Exception("Network error")):
         size = get_image_size("http://example.com/test.jpg")
         assert size is None
 
