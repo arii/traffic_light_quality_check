@@ -186,15 +186,6 @@ def check_duplicate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
                     annotation_id=ann1.id,
                     evidence={"iou": iou, "other_annotation_id": ann2.id}
                 ))
-                findings.append(Finding(
-                    rule_id="OVL-001",
-                    severity="error",
-                    category="overlap",
-                    message="Annotations are duplicates or near-duplicates.",
-                    task_id=task.id,
-                    annotation_id=ann2.id,
-                    evidence={"iou": iou, "other_annotation_id": ann1.id}
-                ))
     return findings
 
 
