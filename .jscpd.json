@@ -12,7 +12,9 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/pnpm-lock.yaml",
-    ".agents/**"
+    ".agents/**",
+    "**/results/*.json",
+    "**/test_out.json"
   ],
   "reporters": ["console"]
 }
