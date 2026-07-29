@@ -1,0 +1,10 @@
+pytest
+pytest-mock
+pylint
+mypy
+types-requests
+types-click
+requests
+click
+pydantic
+PyGithub
