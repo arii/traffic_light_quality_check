@@ -3,7 +3,41 @@
 
 ---
 
-### 1. Approach & Scoping Safekeeping
+### Installation
+
+```bash
+cd traffic_light_quality_check
+pip install -e .
+# or
+pip install -r requirements.txt
+```
+
+### Running the CLI
+
+**From a pre-collected JSON file** (scoped to the target project):
+```bash
+PYTHONPATH=src python3 -m traffic_light \
+  --file ../output.json \
+  --output results/audit.json \
+  --html results/report_output.html \
+  --project-id 5f124e5671c7b700170a16fb
+```
+
+**Directly from the Scale API** (live, requires `SCALE_API_KEY` in `.env`):
+```bash
+PYTHONPATH=src python3 -m traffic_light \
+  --project-id 5f124e5671c7b700170a16fb \
+  --output results/audit.json \
+  --html results/report_output.html
+```
+
+### Output
+- **Audit JSON:** [results/audit.json](results/audit.json)
+- **Interactive Visualizer Report:** [results/report_output.html](results/report_output.html) — open in a browser to inspect bounding boxes, findings, and task annotations side-by-side.
+
+---
+
+### 1. Approach
 - **Visual Problem Exploration:** I started with a web-based visualizer tool to overlay annotations directly onto S3 images. This helped map constraints visually and identify that the database dump contained a mixture of legacy traffic light tasks, retail/invoice linter data, and current target traffic sign tasks.
 - **Scoping Safeguard:** Parameterizing the CLI with `--project-id 5f124e5671c7b700170a16fb` isolates the checker to only validate the 8 target *Traffic Sign Detection* tasks, preventing legacy project schemas from contaminating the results.
 - **Agentic Orchestration:** I drafted a comprehensive task-specification layout (`plan.md`) to guide the module boundaries and system architecture, then directed autonomous agent coding tools to implement the helper files and checker modules under my direct supervision.
@@ -17,13 +51,15 @@ This tool performs automated, deterministic, per-task quality checks for the Obs
 - **Geometry Checks (GEO):** Validates bounding box positioning. Uses **Pillow dimension header-streaming** to fetch true resolution dynamically from image headers, avoiding out-of-bounds false positives without full-image download latency.
 - **Overlap Checks (OVL):** Identifies near-duplicate boxes (using Intersection-over-Union thresholds) and nesting containment anomalies.
 
-### 4. Performance Metrics (Low-Compute Baseline)
-To verify the software's efficiency on standard consumer hardware, benchmarks were executed locally on an Intel Core i5-1035G1 laptop (4 cores, 8 threads, 8GB RAM) serving as a local, resource-constrained baseline:
+### 4. Performance & Known Limitations
+To verify the software's efficiency on standard consumer hardware, benchmarks were executed locally on an Intel Core i5-1035G1 laptop (4 cores, 8 threads, 8GB RAM):
 - **Scoped Run (8 target tasks):** **2.71 seconds** total execution (includes network roundtrips to stream Pillow headers for image dimensions).
 - **Full Run (24 mixed tasks):** **5.86 seconds** total execution.
-- **Scaling Dynamics:** Latency averages **~0.25 seconds** per task due to sequential I/O and HTTP metadata requests. 
+- **Scaling Dynamics:** Latency averages **~0.25 seconds** per task due to sequential I/O and HTTP metadata requests.
 
-*Because the workload is strictly I/O-bound rather than CPU-bound, implementing an asynchronous thread pool will bypass sequential networking bottlenecks. This production optimization will fully leverage the CPU's 8 hardware threads, driving execution times down to < 0.05 seconds per task.*
+*Because the workload is strictly I/O-bound rather than CPU-bound, implementing an asynchronous thread pool will bypass sequential networking bottlenecks — fully leveraging the CPU's 8 hardware threads to drive execution times down to < 0.05 seconds per task.*
+
+**Known Limitation — Undetected False Positives:** The checker currently cannot detect visually empty bounding boxes whose coordinates are geometrically valid. Task `5f127f699740b80017f9b170` (a low-light night scene) passed all rules with 0 findings, yet visual inspection confirmed several boxes drawn over pitch-black background regions containing no sign content. This class of error requires image-content inspection and is targeted as the top future roadmap item.
 
 ### 5. Future Roadmap (Reflection)
 1. **CV-Based False Positive Auditing:** Flag empty boxes drawn over night-time shadow regions (as seen in task `5f127f699740b80017f9b170`).
@@ -51,16 +87,17 @@ To verify the software's efficiency on standard consumer hardware, benchmarks we
 
 ### 7. Scoped Audit Results (8 Assigned Tasks)
 
-The audit was executed against the **Traffic Sign Detection** project tasks:
-- **Summary:** Out of the 8 assigned tasks, **5 tasks were clean** (0 findings), **2 tasks triggered warning flags**, and **1 task contained severe duplicate errors**. 
+```
+Audit complete. Found 28 issues across 8 tasks.
+```
 
-| Task ID | Findings | Project Source | Notable Issues |
-| :--- | :--- | :--- | :--- |
-| `5f127f6f26831d0010e985e5` | 0 findings | `Traffic Sign Detection` | **Clean:** Bounding box coordinates and attributes match the target taxonomy. |
-| `5f127f6c3a6b1000172320ad` | 0 findings | `Traffic Sign Detection` | **Clean:** Bounding box coordinates and attributes match the target taxonomy. |
-| `5f127f699740b80017f9b170` | 0 findings | `Traffic Sign Detection` | **Clean (Visual False Positives Present):** Passed all geometric/taxonomic rules, but visual inspection reveals empty bounding boxes placed in pitch-black areas of the night image. |
-| `5f127f671ab28b001762c204` | 19 findings | `Traffic Sign Detection` | **Severe Overlaps:** 15 severe `OVL-001` duplicate annotation errors (triggered our IoU > 0.90 threshold, reaching up to 0.98) on stop signs; 4 `OVL-002` containment flags. Density is due to 6 duplicate annotations overlaid on the same sign region. |
-| `5f127f643a6b1000172320a5` | 0 findings | `Traffic Sign Detection` | **Clean:** Bounding box coordinates and attributes match the target taxonomy. |
-| `5f127f5f3a6b100017232099` | 2 findings | `Traffic Sign Detection` | **Warnings:** 2 `OVL-002` suspicious containment flags (bounding box nested within another). |
-| `5f127f5ab1cb1300109e4ffc` | 0 findings | `Traffic Sign Detection` | **Clean:** Bounding box coordinates and attributes match the target taxonomy. |
-| `5f127f55fdc4150010e37244` | 7 findings | `Traffic Sign Detection` | **Warnings:** 7 `GEO-002` micro box warnings (bounding box dimensions are extremely small, under `3.0` pixels). |
+| Task ID | Findings | Notable Issues |
+| :--- | :--- | :--- |
+| `5f127f6f26831d0010e985e5` | 0 | **Clean** |
+| `5f127f6c3a6b1000172320ad` | 0 | **Clean** |
+| `5f127f699740b80017f9b170` | 0 | **Clean (Visual False Positives Present):** Passed all rules, but visual inspection reveals empty boxes in a pitch-black night scene — undetectable by coordinate-only validators. |
+| `5f127f671ab28b001762c204` | 19 | **Severe Overlaps:** 15 `OVL-001` errors (triggered IoU > 0.90, reaching up to 0.98); 4 `OVL-002` containment flags. 6 duplicate annotations stacked on the same stop sign region. |
+| `5f127f643a6b1000172320a5` | 0 | **Clean** |
+| `5f127f5f3a6b100017232099` | 2 | **Warnings:** 2 `OVL-002` suspicious containment flags. |
+| `5f127f5ab1cb1300109e4ffc` | 0 | **Clean** |
+| `5f127f55fdc4150010e37244` | 7 | **Warnings:** 7 `GEO-002` micro box warnings (dimensions < 3px). |
