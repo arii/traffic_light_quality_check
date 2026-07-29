@@ -27,7 +27,7 @@ This is only required when running against the live Scale API (i.e. without `--f
 **From a pre-collected JSON file** (scoped to the target project):
 ```bash
 PYTHONPATH=src python3 -m traffic_light \
-  --file ../output.json \
+  --file output.json \
   --output results/audit.json \
   --html results/report_output.html \
   --project-id 5f124e5671c7b700170a16fb
