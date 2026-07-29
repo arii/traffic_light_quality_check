@@ -143,6 +143,9 @@ runs:
           pip install -r "$CLI_DIR/requirements-ai.txt" --break-system-packages
         fi
         pip install -e "$CLI_DIR" --break-system-packages
+        if [ -d "traffic_light_quality_check" ]; then
+          pip install -e traffic_light_quality_check --break-system-packages
+        fi
 
         echo "::endgroup::"
       shell: bash

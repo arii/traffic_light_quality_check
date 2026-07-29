@@ -240,6 +240,14 @@ install_python_deps() {
     STATUS_PYTHON="INSTALLED (minimal)"
   fi
 
+<<<<<<< HEAD
+=======
+  if [ -f "traffic_light_quality_check/pyproject.toml" ]; then
+    log "Performing editable install of traffic_light_quality_check package..."
+    pip_install --root-user-action=ignore -e "traffic_light_quality_check/"
+  fi
+
+>>>>>>> origin/main
   if [ "$INSTALL_AI_DEPS" = "1" ]; then
     STATUS_PYTHON="${STATUS_PYTHON} + AI"
   fi

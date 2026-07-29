@@ -46,6 +46,10 @@ def containment_ratio(inner: BoundingBox, outer: BoundingBox) -> float:
         return 0.0
     return inter / area_inner
 
+def is_degenerate(box: BoundingBox) -> bool:
+    """Returns True if the bounding box has zero width or height."""
+    return box.width <= 0.0 or box.height <= 0.0
+
 def is_out_of_bounds(box: BoundingBox, image_width: int, image_height: int) -> bool:
     """Returns True if the box is outside the image boundary."""
     if box.left < 0 or box.top < 0:

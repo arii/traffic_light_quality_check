@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Set, Dict, Iterable
+from typing import List, Set, Dict
 
 from .models import Task, Finding, Annotation
 from . import geometry
@@ -139,7 +139,7 @@ def check_out_of_bounds(task: Task, config: QualityConfig) -> List[Finding]:
                 rule_id="GEO-001",
                 severity="error",
                 category="geometry",
-                message="Bounding box is out of image bounds.",
+                message="Bounding box is out of image bounds or touches the edges.",
                 task_id=task.id,
                 annotation_id=ann.id,
                 evidence={
@@ -150,9 +150,27 @@ def check_out_of_bounds(task: Task, config: QualityConfig) -> List[Finding]:
     return findings
 
 
+def check_degenerate_boxes(task: Task, config: QualityConfig) -> List[Finding]:
+    findings = []
+    for ann in task.annotations:
+        if geometry.is_degenerate(ann.box):
+            findings.append(Finding(
+                rule_id="GEO-005",
+                severity="error",
+                category="geometry",
+                message="Bounding box has zero width or height.",
+                task_id=task.id,
+                annotation_id=ann.id,
+                evidence={"width": ann.box.width, "height": ann.box.height}
+            ))
+    return findings
+
+
 def check_micro_boxes(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
+        if geometry.is_degenerate(ann.box):
+            continue
         area = geometry.box_area(ann.box)
         if ann.box.width < config.micro_box_width or \
            ann.box.height < config.micro_box_height or \
@@ -191,6 +209,8 @@ def check_giant_boxes(task: Task, config: QualityConfig) -> List[Finding]:
 def check_extreme_aspect_ratio(task: Task, config: QualityConfig) -> List[Finding]:
     findings = []
     for ann in task.annotations:
+        if geometry.is_degenerate(ann.box):
+            continue
         ratio = geometry.aspect_ratio(ann.box)
         if ratio > config.extreme_aspect_ratio_max or ratio < config.extreme_aspect_ratio_min:
             findings.append(Finding(
@@ -253,27 +273,10 @@ RULES = [
     check_invalid_labels,
     check_invalid_attributes,
     check_out_of_bounds,
+    check_degenerate_boxes,
     check_micro_boxes,
     check_giant_boxes,
     check_extreme_aspect_ratio,
     check_duplicate_boxes,
     check_suspicious_containment,
 ]
-
-def audit_task(task: Task, config: QualityConfig = None) -> list[Finding]:
-    """Runs all rules on a single task and returns findings."""
-    if config is None:
-        config = QualityConfig()
-
-    findings = []
-    for rule in RULES:
-        findings.extend(rule(task, config))
-
-    return findings
-
-def audit_tasks(tasks: Iterable[Task], config: QualityConfig = None) -> dict[str, list[Finding]]:
-    """Runs all rules on a list of tasks and groups findings by task_id."""
-    return {
-        task.id: audit_task(task, config)
-        for task in tasks
-    }

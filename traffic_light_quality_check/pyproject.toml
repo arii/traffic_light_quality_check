@@ -9,11 +9,11 @@ description = "Automated quality checks for Traffic Sign annotations"
 requires-python = ">=3.10"
 dependencies = [
     "requests>=2.31",
-    "pillow>=10.0.0",
+    "Pillow>=10.0.0",
 ]
 
 [project.scripts]
-traffic-light-check = "traffic_light.__main__:main"
+traffic-light-check = "traffic_light.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
