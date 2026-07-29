@@ -557,7 +557,7 @@
       document.getElementById('raw-json-block').textContent = JSON.stringify(task, null, 2);
 
       loadedImage = new Image();
-      loadedImage.crossOrigin = 'anonymous';
+      // Removed crossOrigin='anonymous' to prevent CORS blocking when loading from file:// origins
       loadedImage.src = imgUrl;
 
       loadedImage.onload = () => {
