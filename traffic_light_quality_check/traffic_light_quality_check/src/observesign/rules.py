@@ -1,5 +1,8 @@
+"""
+Quality check rules for ObserveSign annotations.
+"""
 from typing import List
-from .models import Task, Finding, Annotation
+from .models import Task, Finding
 from .geometry import area, calculate_iou, is_fully_contained
 
 ALLOWED_LABELS = {
@@ -100,9 +103,6 @@ def _check_tax_004(task: Task) -> List[Finding]:
     findings = []
     for ann in task.annotations:
         if ann.label == "traffic_control_sign":
-            # Heuristic: Check if there is any traffic_light metadata, e.g. traffic_light_status in attributes
-            # Or if it's implicitly a traffic light. The spec implies we should check if background color is set to "other" for traffic lights.
-            # If traffic_light_status exists or if the label is traffic light, we enforce background_color == "other"
             is_traffic_light = False
 
             # 1. From attributes (if the task had a sub-attribute like traffic_light_status)
@@ -110,10 +110,8 @@ def _check_tax_004(task: Task) -> List[Finding]:
                 is_traffic_light = True
 
             # 2. Heuristic check based on description or if background color was erroneously set to red/yellow/green
-            # Sometimes annotators mistakenly put the light color (red/green/yellow) as the background color.
             bg = ann.attributes.get("background_color")
             if bg in {"red", "yellow", "green"}:
-                # It's very likely they labeled the light color instead of the sign's background.
                 is_traffic_light = True
 
             if is_traffic_light and bg != "other":
@@ -129,6 +127,7 @@ def _check_tax_004(task: Task) -> List[Finding]:
     return findings
 
 def run_tax_rules(task: Task) -> List[Finding]:
+    """Runs all taxonomy rules for a given task."""
     findings = []
     findings.extend(_check_tax_001(task))
     findings.extend(_check_tax_002(task))
@@ -206,6 +205,7 @@ def _check_geo_003(task: Task) -> List[Finding]:
     return findings
 
 def run_geo_rules(task: Task) -> List[Finding]:
+    """Runs all geometric rules for a given task."""
     findings = []
     findings.extend(_check_geo_001(task))
     findings.extend(_check_geo_002(task))
@@ -226,7 +226,7 @@ def _check_ovl_001(task: Task) -> List[Finding]:
                     rule_id="OVL-001",
                     severity="error",
                     category="overlap",
-                    explanation=f"Duplicate or highly overlapping boxes (IoU > 0.90).",
+                    explanation="Duplicate or highly overlapping boxes (IoU > 0.90).",
                     annotation_id=anns[i].uuid,
                     evidence={"iou": iou, "other_annotation_id": anns[j].uuid}
                 ))
@@ -247,19 +247,21 @@ def _check_ovl_002(task: Task) -> List[Finding]:
                     rule_id="OVL-002",
                     severity="warning",
                     category="overlap",
-                    explanation=f"Suspicious containment: box is fully contained within another box.",
+                    explanation="Suspicious containment: box is fully contained within another box.",
                     annotation_id=anns[i].uuid,
                     evidence={"contained_in": anns[j].uuid}
                 ))
     return findings
 
 def run_ovl_rules(task: Task) -> List[Finding]:
+    """Runs all overlap rules for a given task."""
     findings = []
     findings.extend(_check_ovl_001(task))
     findings.extend(_check_ovl_002(task))
     return findings
 
 def run_all_rules(task: Task) -> List[Finding]:
+    """Runs all quality rules (taxonomy, geometry, overlap) for a given task."""
     findings = []
     findings.extend(run_tax_rules(task))
     findings.extend(run_geo_rules(task))

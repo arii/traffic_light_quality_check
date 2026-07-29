@@ -1,12 +1,15 @@
+"""
+Command line interface for ObserveSign quality check tool.
+"""
 import argparse
-import os
 import json
+from dotenv import load_dotenv
 from .client import ScaleClient
 from .engine import QualityEngine
 from .output import write_findings_json, write_findings_csv
-from dotenv import load_dotenv
 
 def main():
+    """Main CLI entrypoint."""
     load_dotenv()
 
     parser = argparse.ArgumentParser(description="ObserveSign Quality Checker")

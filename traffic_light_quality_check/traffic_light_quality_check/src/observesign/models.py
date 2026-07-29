@@ -1,9 +1,13 @@
+"""
+Data models for ObserveSign annotations.
+"""
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
 import uuid
 
 @dataclass
 class Annotation:
+    """Represents a single bounding box annotation."""
     uuid: str
     label: str
     geometry: str
@@ -15,6 +19,7 @@ class Annotation:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Annotation':
+        """Creates an Annotation instance from a raw dictionary."""
         return cls(
             uuid=data.get('uuid', str(uuid.uuid4())),
             label=data.get('label', ''),
@@ -28,6 +33,7 @@ class Annotation:
 
 @dataclass
 class Task:
+    """Represents a labeling task with a list of annotations."""
     task_id: str
     annotations: List[Annotation]
     image_width: Optional[float] = None
@@ -36,6 +42,7 @@ class Task:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Task':
+        """Creates a Task instance from a raw Scale API response dictionary."""
         task_id = data.get('task_id', '')
         response = data.get('response', {})
         annotations_data = response.get('annotations', [])
@@ -52,6 +59,7 @@ class Task:
 
 @dataclass
 class Finding:
+    """Represents a single quality check finding/violation."""
     task_id: str
     rule_id: str
     severity: str
@@ -61,6 +69,7 @@ class Finding:
     evidence: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
+        """Serializes the Finding into a dictionary."""
         return {
             "task_id": self.task_id,
             "rule_id": self.rule_id,
