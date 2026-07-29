@@ -119,6 +119,10 @@ if [ "$FORCE" -eq 1 ] || ! command -v td-cli >/dev/null 2>&1 || [ -n "$VENV_PATH
     if [ -f "${CLI_ROOT}/requirements-dev.txt" ]; then
         timeout 600 $PIP_CMD install -r "${CLI_ROOT}/requirements-dev.txt" $PIP_OPTS
     fi
+    if [ -d "traffic_light_quality_check" ]; then
+        echo "Installing traffic_light_quality_check..."
+        timeout 600 $PIP_CMD install -e "traffic_light_quality_check" $PIP_OPTS
+    fi
 else
     echo "BoomTick CLI already installed. Skipping (use --force to reinstall)."
 fi
