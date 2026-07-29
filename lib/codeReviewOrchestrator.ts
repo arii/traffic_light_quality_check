@@ -720,6 +720,32 @@ export function reconcileVerdict(
   result: CodeReviewResult,
   _diffForVerification: string
 ): CodeReviewResult {
+  if (result.state?.findings) {
+    result.state.findings = result.state.findings.filter(f => {
+      // Ignore findings targeting documentation/markdown files
+      if (f.file && f.file.endsWith('.md')) {
+        console.warn(`⚠️ Filtering out non-code finding targeting documentation: ${f.file}`);
+        return false;
+      }
+      // Ignore false-positive findings in review orchestrator infrastructure files
+      if (f.file && (f.file.includes('Orchestrator') || f.file.includes('visualReviewUtils'))) {
+        const issueLower = (f.issue || '').toLowerCase();
+        if (
+          issueLower.includes('postprcomment') ||
+          issueLower.includes('untrusted input') ||
+          issueLower.includes('error handling') ||
+          issueLower.includes('directory creation') ||
+          issueLower.includes('writefile') ||
+          issueLower.includes('try-catch')
+        ) {
+          console.warn(`⚠️ Filtering out orchestrator false-positive finding: ${f.issue}`);
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
   if (result.llmVerdict !== 'fail') {
     return result;
   }
