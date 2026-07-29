@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "traffic-light-quality-check"
+version = "0.1.0"
+description = "Automated quality checks for Traffic Light annotations"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31",
+    "python-dotenv>=1.0"
+]
+
+[project.scripts]
+traffic-light-check = "traffic_light.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
