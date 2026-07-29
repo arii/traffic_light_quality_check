@@ -5,19 +5,25 @@
 
 ## PAGE 1: Executive Summary & System Design
 
-### 1. Overview
+### 1. Approach
+- **Visual Problem Exploration:** Rather than coding immediately, I created a web-based visualizer tool to overlay annotations directly onto the raw S3 images. This helped map constraints visually and identify legacy dataset schema differences before writing rules.
+- **Structured Planning:** I designed a comprehensive task-spec plan (`plan.md`) defining the repository layout and module boundaries to prevent file sprawl.
+- **Agentic Orchestration:** Once the files and boundaries were locked, I leveraged autonomous agent workflows to implement the validation checking modules.
+- **Verification Loop:** I verified the output findings back inside the visualizer tool to confirm checker accuracy. This loop exposed key edge cases, such as undetected false-positive empty bounding boxes in night-time images (such as task `5f127f699740b80017f9b170`).
+
+### 2. Overview
 This tool performs automated, deterministic, per-task quality checks for the ObserveSign Traffic Sign Detection pipeline. All findings are mapped natively to Scale's Fixless Audits API structure (using `type` [error/flag] and `category` fields), ensuring results can be ingested directly back into Scale's audit feedback loop.
 
-### 2. Quality Checks (Summary of Categories)
+### 3. Quality Checks (Summary of Categories)
 The validator evaluates annotations against three core logical domains:
-- **Taxonomy Checks (TAX):** Confirms labels and attributes align with target classes. Includes a **legacy transition layer** that downgrades historical traffic light labels/attributes to `warning` flags rather than failing the run, preserving the utility of the tool across legacy datasets.
-- **Geometry Checks (GEO):** Validates bounding box positioning. Uses **Pillow dimension header-streaming** to fetch true resolution dynamically from image headers, avoiding out-of-bounds false positives without full-image download latency. Flags micro, giant, extreme aspect ratios, and degenerate 0-size boxes.
-- **Overlap Checks (OVL):** Identifies near-duplicate boxes (using Intersection-over-Union thresholds) and suspicious nesting where one annotation fully contains another.
+- **Taxonomy Checks (TAX):** Confirms labels and attributes align with target classes. Includes a legacy transition layer that downgrades legacy traffic light labels to `warning` flags rather than failing the run.
+- **Geometry Checks (GEO):** Validates bounding box positioning. Uses Pillow dimension header-streaming to fetch true resolution dynamically from image headers, avoiding out-of-bounds false positives without full-image download latency.
+- **Overlap Checks (OVL):** Identifies duplicate boxes (using IoU thresholds) and nesting containment anomalies.
 
-### 3. Scope Safeguard
+### 4. Scope Safeguard
 The engine requires a `project_id` parameter to isolate checks to the specified project. In shared accounts, this prevents cross-project annotation schemas (e.g. retail or invoice data) from contaminating results at scale.
 
-### 4. Future Roadmap (Reflection)
+### 5. Future Roadmap (Reflection)
 1. **CV-Based False Positive Auditing:** Flag empty boxes drawn over night-time shadow regions (as seen in task `5f127f699740b80017f9b170`).
 2. **Density Outlier Detection:** Flag images with abnormally high annotation densities to catch spamming or systematic labeling errors.
 3. **Cross-Task Consensus:** Use perceptual image hashing to find duplicate frames and flag labeling mismatches.
@@ -30,7 +36,7 @@ The engine requires a `project_id` parameter to isolate checks to the specified 
 
 ## PAGE 2: Detailed Reference Tables & Audit Results
 
-### 5. Detailed Quality Rules Reference Table
+### 6. Detailed Quality Rules Reference Table
 
 | Rule ID | Category | Rule Name | Severity | Fixless Category | Short Description |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -45,7 +51,7 @@ The engine requires a `project_id` parameter to isolate checks to the specified 
 | **OVL-001** | Overlap | Duplicate Annotations | `error` | `extraneous` | Severe error if overlapping boxes have IoU > 0.90 (duplicate labels). |
 | **OVL-002** | Overlap | Suspicious Containment | `flag` | `position` | Warning flag if one bounding box is fully nested inside another. |
 
-### 6. Scoped Audit Results (8 Assigned Tasks)
+### 7. Scoped Audit Results (8 Assigned Tasks)
 
 The audit was executed against the **Traffic Sign Detection** project tasks:
 - **Summary:** Out of the 8 assigned tasks, **5 tasks were clean** (0 findings), **2 tasks triggered warning flags**, and **1 task contained severe duplicate errors**. 
