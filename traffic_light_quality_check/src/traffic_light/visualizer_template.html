@@ -546,6 +546,9 @@
       const taskId = task.task_id || task._id || task.id || 'Unknown';
       document.getElementById('image-status-bar').textContent = `Task ID: ${taskId} | Project: ${task.project || 'ObserveSign Sign detection'}`;
 
+      // Update JSON block immediately on switch
+      document.getElementById('raw-json-block').textContent = JSON.stringify(task, null, 2);
+
       loadedImage = new Image();
       loadedImage.crossOrigin = 'anonymous';
       loadedImage.src = imgUrl;
@@ -558,12 +561,15 @@
         renderCanvas();
         updateFindingsTab();
         updateAnnotationsTab();
-        document.getElementById('raw-json-block').textContent = JSON.stringify(task, null, 2);
       };
 
       loadedImage.onerror = () => {
         loader.classList.add('hidden');
         showToast('Failed to load image from attachment URL', 'error');
+        // Even if image fails, we should still update findings/annotations
+        document.getElementById('canvas-ann-count').textContent = `Annotations: ${task.response?.annotations?.length || 0}`;
+        updateFindingsTab();
+        updateAnnotationsTab();
       };
     }
 
@@ -967,8 +973,16 @@
       renderCanvas();
     }, { passive: false });
 
-    document.getElementById('btn-zoom-in').onclick = () => { state.zoom *= 1.15; renderCanvas(); };
-    document.getElementById('btn-zoom-out').onclick = () => { state.zoom *= 0.85; renderCanvas(); };
+    document.getElementById('btn-zoom-in').onclick = () => {
+      state.zoom = Math.max(0.1, Math.min(5.0, state.zoom * 1.15));
+      document.getElementById('zoom-text').textContent = `${Math.round(state.zoom * 100)}%`;
+      renderCanvas();
+    };
+    document.getElementById('btn-zoom-out').onclick = () => {
+      state.zoom = Math.max(0.1, Math.min(5.0, state.zoom * 0.85));
+      document.getElementById('zoom-text').textContent = `${Math.round(state.zoom * 100)}%`;
+      renderCanvas();
+    };
     document.getElementById('btn-zoom-reset').onclick = resetZoomAndPan;
 
     document.getElementById('toggle-boxes').onchange = (e) => { state.layers.boxes = e.target.checked; renderCanvas(); };
