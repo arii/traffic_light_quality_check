@@ -47,12 +47,12 @@ def containment_ratio(inner: BoundingBox, outer: BoundingBox) -> float:
     return inter / area_inner
 
 def is_out_of_bounds(box: BoundingBox, image_width: int, image_height: int) -> bool:
-    """Returns True if the box is outside or touches the image boundary."""
-    if box.left <= 0 or box.top <= 0:
+    """Returns True if the box is outside the image boundary."""
+    if box.left < 0 or box.top < 0:
         return True
-    if box.left + box.width >= image_width:
+    if box.left + box.width > image_width:
         return True
-    if box.top + box.height >= image_height:
+    if box.top + box.height > image_height:
         return True
     return False
 
