@@ -1,5 +1,5 @@
 from traffic_light.models import Task, Annotation, BoundingBox
-from traffic_light.checker import (
+from traffic_light.rules import (
     QualityConfig,
     check_invalid_labels,
     check_invalid_attributes,
@@ -67,7 +67,7 @@ def test_suspicious_containment():
     assert findings[0].rule_id == "OVL-002"
     assert findings[0].annotation_id == "2"
 
-from traffic_light.checker import audit_task
+from traffic_light.rules import audit_task
 
 def test_engine_valid_task():
     ann = Annotation(id="1", label="traffic_control_sign", box=BoundingBox(10, 10, 50, 50), attributes={"background_color": "white"})
