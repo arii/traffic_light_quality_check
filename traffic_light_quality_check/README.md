@@ -32,10 +32,18 @@ PYTHONPATH=src python3 -m traffic_light \
   --html results/report_output.html
 ```
 
-**From a local JSON dump** (offline fallback — pass any file exported from Scale):
+**Save a local snapshot for offline reuse** (add `--save-tasks`):
 ```bash
 PYTHONPATH=src python3 -m traffic_light \
-  --file /path/to/output.json \
+  --project-id 5f124e5671c7b700170a16fb \
+  --output results/audit.json \
+  --save-tasks tasks_snapshot.json
+```
+
+**Re-run from a saved snapshot** (no API key needed):
+```bash
+PYTHONPATH=src python3 -m traffic_light \
+  --file tasks_snapshot.json \
   --output results/audit.json \
   --html results/report_output.html \
   --project-id 5f124e5671c7b700170a16fb

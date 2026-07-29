@@ -15,6 +15,7 @@ def main():
     parser.add_argument("--file", type=str, help="Path to local JSON file with task data")
     parser.add_argument("--output", type=str, required=True, help="Path to output file (JSON or CSV)")
     parser.add_argument("--html", type=str, help="Path to generate interactive HTML visualization report")
+    parser.add_argument("--save-tasks", type=str, metavar="PATH", help="Save fetched raw tasks to a JSON file for offline reuse with --file")
 
     args = parser.parse_args()
 
@@ -28,6 +29,12 @@ def main():
     if not raw_tasks:
         logging.info("No tasks found.")
         sys.exit(1)
+
+    if args.save_tasks:
+        import json
+        with open(args.save_tasks, "w", encoding="utf-8") as f:
+            json.dump({"docs": raw_tasks}, f, ensure_ascii=False, indent=2)
+        logging.info(f"Raw tasks saved to {args.save_tasks}")
 
     tasks = (normalize_task(t) for t in raw_tasks)
 
