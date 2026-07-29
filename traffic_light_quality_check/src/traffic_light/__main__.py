@@ -48,15 +48,15 @@ def main():
         from .output import format_findings_as_dicts
         template_path = os.path.join(os.path.dirname(__file__), "visualizer_template.html")
         if not os.path.exists(template_path):
-            print(f"Error: HTML template not found at {template_path}", file=sys.stderr)
+            logging.error(f"Error: HTML template not found at {template_path}")
         else:
             try:
                 with open(template_path, "r", encoding="utf-8") as f:
                     template_content = f.read()
 
                 import json
-                tasks_json = json.dumps(raw_tasks, ensure_ascii=False)
-                findings_json = json.dumps(format_findings_as_dicts(all_findings), ensure_ascii=False)
+                tasks_json = json.dumps(raw_tasks, ensure_ascii=True).replace('<', '\\u003c').replace('>', '\\u003e')
+                findings_json = json.dumps(format_findings_as_dicts(all_findings), ensure_ascii=True).replace('<', '\\u003c').replace('>', '\\u003e')
 
                 placeholder = """    // __EMBEDDED_DATA_REPLACEMENT_PLACEHOLDER__
     const EMBEDDED_TASKS = null;
@@ -76,9 +76,9 @@ def main():
                 with open(args.html, "w", encoding="utf-8") as f:
                     f.write(report_content)
 
-                print(f"Visualization report generated at {args.html}")
+                logging.info(f"Visualization report generated at {args.html}")
             except Exception as e:
-                print(f"Error generating HTML report: {e}", file=sys.stderr)
+                logging.exception(f"Error generating HTML report: {e}")
 
 if __name__ == "__main__":
     main()
