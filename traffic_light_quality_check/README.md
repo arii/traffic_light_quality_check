@@ -12,6 +12,16 @@ pip install -e .
 pip install -r requirements.txt
 ```
 
+### Environment Setup (for live API usage)
+
+Create a `.env` file in the `traffic_light_quality_check/` directory:
+
+```bash
+echo "SCALE_API_KEY=your_api_key_here" > .env
+```
+
+This is only required when running against the live Scale API (i.e. without `--file`). When using `--file` with a pre-collected JSON dump, no API key is needed.
+
 ### Running the CLI
 
 **From a pre-collected JSON file** (scoped to the target project):
