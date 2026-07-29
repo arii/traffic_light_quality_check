@@ -1005,63 +1005,46 @@
     const paneBoxes = document.getElementById('pane-boxes');
     const paneRaw = document.getElementById('pane-raw');
 
-    tabBtnFindings.onclick = () => {
-      paneFindings.classList.remove('hidden');
-      paneBoxes.classList.add('hidden');
-      paneRaw.classList.add('hidden');
-      tabBtnFindings.className = "flex-1 py-2 text-center border-b-2 border-blue-500 text-blue-400 font-medium";
-      tabBtnBoxes.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
-      tabBtnRaw.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
-    };
-    tabBtnBoxes.onclick = () => {
-      paneFindings.classList.add('hidden');
-      paneBoxes.classList.remove('hidden');
-      paneRaw.classList.add('hidden');
-      tabBtnBoxes.className = "flex-1 py-2 text-center border-b-2 border-blue-500 text-blue-400 font-medium";
-      tabBtnFindings.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
-      tabBtnRaw.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
-    };
-    tabBtnRaw.onclick = () => {
-      paneFindings.classList.add('hidden');
-      paneBoxes.classList.add('hidden');
-      paneRaw.classList.remove('hidden');
-      tabBtnRaw.className = "flex-1 py-2 text-center border-b-2 border-blue-500 text-blue-400 font-medium";
-      tabBtnFindings.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
-      tabBtnBoxes.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
-    };
+    const tabs = [
+      { id: 'findings', btn: tabBtnFindings, pane: paneFindings },
+      { id: 'boxes', btn: tabBtnBoxes, pane: paneBoxes },
+      { id: 'raw', btn: tabBtnRaw, pane: paneRaw }
+    ];
+
+    function switchTab(targetId) {
+      tabs.forEach(tab => {
+        if (tab.id === targetId) {
+          tab.pane.classList.remove('hidden');
+          tab.btn.className = "flex-1 py-2 text-center border-b-2 border-blue-500 text-blue-400 font-medium";
+        } else {
+          tab.pane.classList.add('hidden');
+          tab.btn.className = "flex-1 py-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium";
+        }
+      });
+    }
+
+    tabBtnFindings.onclick = () => switchTab('findings');
+    tabBtnBoxes.onclick = () => switchTab('boxes');
+    tabBtnRaw.onclick = () => switchTab('raw');
 
     // Severity summary filter actions
-    document.getElementById('filter-error-btn').onclick = () => {
-      toggleSeverityFilter('error');
-    };
-    document.getElementById('filter-warning-btn').onclick = () => {
-      toggleSeverityFilter('warning');
-    };
-
-    function toggleSeverityFilter(severity) {
-      if (state.filters.severity === severity) {
-        state.filters.severity = null;
-      } else {
-        state.filters.severity = severity;
-      }
-      updateFiltersUI();
-      updateFindingsTab();
-    }
+    document.getElementById('filter-error-btn').onclick = () => toggleFilter('severity', 'error');
+    document.getElementById('filter-warning-btn').onclick = () => toggleFilter('severity', 'warning');
 
     // Category filter button actions
     const catTaxBtn = document.getElementById('cat-filter-tax');
     const catGeoBtn = document.getElementById('cat-filter-geo');
     const catOvlBtn = document.getElementById('cat-filter-ovl');
 
-    catTaxBtn.onclick = () => toggleCategoryFilter('taxonomy');
-    catGeoBtn.onclick = () => toggleCategoryFilter('geometry');
-    catOvlBtn.onclick = () => toggleCategoryFilter('overlap');
+    catTaxBtn.onclick = () => toggleFilter('category', 'taxonomy');
+    catGeoBtn.onclick = () => toggleFilter('category', 'geometry');
+    catOvlBtn.onclick = () => toggleFilter('category', 'overlap');
 
-    function toggleCategoryFilter(category) {
-      if (state.filters.category === category) {
-        state.filters.category = null;
+    function toggleFilter(filterType, val) {
+      if (state.filters[filterType] === val) {
+        state.filters[filterType] = null;
       } else {
-        state.filters.category = category;
+        state.filters[filterType] = val;
       }
       updateFiltersUI();
       updateFindingsTab();
