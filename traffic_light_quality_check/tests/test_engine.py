@@ -1,5 +1,5 @@
 from traffic_light.models import Task, Annotation, BoundingBox
-from traffic_light.rules import audit_task
+from traffic_light.engine import audit_task
 from traffic_light.rules import QualityConfig
 
 def test_engine_valid_task():
