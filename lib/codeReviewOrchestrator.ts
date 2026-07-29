@@ -632,7 +632,11 @@ export async function orchestrateCodeReview(
   if (filteredSummary.isTruncated) {
     const report = generateTruncatedReviewMarkdown(filteredSummary, client);
     await fs.promises.writeFile(agentReportPath, report);
-    await postPRComment(report, client.reportTitle, prevState);
+    try {
+      await postPRComment(report, client.reportTitle, prevState);
+    } catch (e) {
+      console.warn('⚠️ Failed to post or update PR comment:', e);
+    }
 
     const safeReportFileName = path.basename(client.reportFileName);
     const verdictPath = path.join(ARTIFACTS_DIR, `${safeReportFileName.replace('.md', '')}-verdict.json`);
@@ -673,7 +677,11 @@ export async function orchestrateCodeReview(
   console.log(`✅ Local report written to ${agentReportPath}`);
 
   // Post to GitHub PR
-  await postPRComment(report, client.reportTitle, finalResult.state);
+  try {
+    await postPRComment(report, client.reportTitle, finalResult.state);
+  } catch (e) {
+    console.warn('⚠️ Failed to post or update PR comment:', e);
+  }
 
   // Also alert Jules if this PR is from a Jules session
   const julesSessionId = await getJulesSessionIdFromPR();
