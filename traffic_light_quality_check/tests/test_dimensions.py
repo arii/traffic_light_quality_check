@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from traffic_light.client import get_image_size, normalize_task
-from traffic_light.models import Task, Annotation, BoundingBox
-from traffic_light.rules import check_out_of_bounds, check_giant_boxes, QualityConfig
+from observe_sign.client import get_image_size, normalize_task
+from observe_sign.models import Task, Annotation, BoundingBox
+from observe_sign.rules import check_out_of_bounds, check_giant_boxes, QualityConfig
 
 def test_get_image_size_success():
     # Mock urllib.request.urlopen to return an image-like object
@@ -48,7 +48,7 @@ def test_normalize_task_without_dimensions_success_fetch():
         },
         "response": {"annotations": []}
     }
-    with patch("traffic_light.client.get_image_size", return_value=(800, 600)) as mock_get_size:
+    with patch("observe_sign.client.get_image_size", return_value=(800, 600)) as mock_get_size:
         task = normalize_task(raw_task)
         assert task.image_width == 800
         assert task.image_height == 600
@@ -62,7 +62,7 @@ def test_normalize_task_without_dimensions_failed_fetch():
         },
         "response": {"annotations": []}
     }
-    with patch("traffic_light.client.get_image_size", return_value=None) as mock_get_size:
+    with patch("observe_sign.client.get_image_size", return_value=None) as mock_get_size:
         task = normalize_task(raw_task)
         assert task.image_width is None
         assert task.image_height is None

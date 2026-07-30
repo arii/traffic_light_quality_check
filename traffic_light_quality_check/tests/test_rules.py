@@ -1,5 +1,5 @@
-from traffic_light.models import Task, Annotation, BoundingBox
-from traffic_light.rules import (
+from observe_sign.models import Task, Annotation, BoundingBox
+from observe_sign.rules import (
     QualityConfig,
     check_invalid_labels,
     check_invalid_attributes,

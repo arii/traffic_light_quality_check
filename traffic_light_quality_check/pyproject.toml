@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "traffic-light-quality-check"
+name = "observe-sign"
 version = "0.1.0"
 description = "Automated quality checks for Traffic Sign annotations"
 requires-python = ">=3.10"
@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-traffic-light-check = "traffic_light.cli:main"
+observe-sign = "observe_sign.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

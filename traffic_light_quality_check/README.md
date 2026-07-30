@@ -6,7 +6,6 @@
 ### Installation
 
 ```bash
-cd traffic_light_quality_check
 pip install -e .
 # or
 pip install -r requirements.txt
@@ -26,7 +25,7 @@ This is only required when running against the live Scale API (i.e. without `--f
 
 **From the Scale API** (primary — requires `SCALE_API_KEY` in `.env`):
 ```bash
-PYTHONPATH=src python3 -m traffic_light \
+PYTHONPATH=src python3 -m observe_sign \
   --project-id 5f124e5671c7b700170a16fb \
   --output results/audit.json \
   --html results/report_output.html
@@ -34,7 +33,7 @@ PYTHONPATH=src python3 -m traffic_light \
 
 **Save a local snapshot for offline reuse** (add `--save-tasks`):
 ```bash
-PYTHONPATH=src python3 -m traffic_light \
+PYTHONPATH=src python3 -m observe_sign \
   --project-id 5f124e5671c7b700170a16fb \
   --output results/audit.json \
   --save-tasks tasks_snapshot.json
@@ -42,7 +41,7 @@ PYTHONPATH=src python3 -m traffic_light \
 
 **Re-run from a saved snapshot** (no API key needed):
 ```bash
-PYTHONPATH=src python3 -m traffic_light \
+PYTHONPATH=src python3 -m observe_sign \
   --file tasks_snapshot.json \
   --output results/audit.json \
   --html results/report_output.html \
