@@ -1,3 +1,4 @@
+import base64
 import io
 import json
 import logging
@@ -46,7 +47,7 @@ def normalize_task(raw_task: Dict[str, Any]) -> Task:
     image_url = ""
     params = raw_task.get("params", {})
     if "attachment" in params:
-         image_url = params["attachment"]
+        image_url = params["attachment"]
 
     image_width = params.get("image_width")
     image_height = params.get("image_height")
@@ -130,50 +131,49 @@ class ScaleClient:
                     tasks = [t for t in tasks if t.get("status") == status]
                 return tasks
         elif project_id:
-             if not self.api_key:
-                 raise ValueError("SCALE_API_KEY environment variable or api_key argument is required when fetching by project_id")
-             import base64
-             auth_str = f"{self.api_key}:"
-             b64_auth = base64.b64encode(auth_str.encode('utf-8')).decode('utf-8')
+            if not self.api_key:
+                raise ValueError("SCALE_API_KEY environment variable or api_key argument is required when fetching by project_id")
+            auth_str = f"{self.api_key}:"
+            b64_auth = base64.b64encode(auth_str.encode('utf-8')).decode('utf-8')
 
-             # Scale API accepts 'project' (name) but not hex project_id as a server-side filter.
-             # Always add a server-side hint and then apply client-side filtering as a safety net.
-             is_hex_id = len(project_id) == 24 and all(c in "0123456789abcdefABCDEF" for c in project_id)
-             param_key = "project_id" if is_hex_id else "project"
+            # Scale API accepts 'project' (name) but not hex project_id as a server-side filter.
+            # Always add a server-side hint and then apply client-side filtering as a safety net.
+            is_hex_id = len(project_id) == 24 and all(c in "0123456789abcdefABCDEF" for c in project_id)
+            param_key = "project_id" if is_hex_id else "project"
 
-             all_tasks = []
-             next_token = None
-             try:
-                 while True:
-                     url = f"{self.base_url}/tasks?{param_key}={urllib.parse.quote(project_id)}&limit=100"
-                     if status is not None:
-                         url += f"&status={urllib.parse.quote(status)}"
-                     if next_token:
-                         url += f"&next_token={urllib.parse.quote(next_token)}"
-                     req = urllib.request.Request(url)
-                     req.add_header("Authorization", f"Basic {b64_auth}")
-                     req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                     with urllib.request.urlopen(req) as response:
-                         data = json.loads(response.read().decode('utf-8'))
-                     all_tasks.extend(data.get("docs", []))
-                     if data.get("has_more") and data.get("next_token"):
-                         next_token = data["next_token"]
-                     else:
-                         break
-             except urllib.error.URLError as e:
-                 logging.error(f"Error fetching from Scale API: {e}")
+            all_tasks = []
+            next_token = None
+            try:
+                while True:
+                    url = f"{self.base_url}/tasks?{param_key}={urllib.parse.quote(project_id)}&limit=100"
+                    if status is not None:
+                        url += f"&status={urllib.parse.quote(status)}"
+                    if next_token:
+                        url += f"&next_token={urllib.parse.quote(next_token)}"
+                    req = urllib.request.Request(url)
+                    req.add_header("Authorization", f"Basic {b64_auth}")
+                    req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                    with urllib.request.urlopen(req) as response:
+                        data = json.loads(response.read().decode('utf-8'))
+                    all_tasks.extend(data.get("docs", []))
+                    if data.get("has_more") and data.get("next_token"):
+                        next_token = data["next_token"]
+                    else:
+                        break
+            except urllib.error.URLError as e:
+                logging.error(f"Error fetching from Scale API: {e}")
 
-             # Client-side safety filters — ensures correct project and status even if
-             # the API server-side filter doesn't honour the hex project_id param.
-             all_tasks = [
-                 t for t in all_tasks
-                 if t.get("projectId") == project_id
-                 or t.get("project") == project_id
-                 or t.get("project_id") == project_id
-             ]
-             if status is not None:
-                 all_tasks = [t for t in all_tasks if t.get("status") == status]
-             return all_tasks
+            # Client-side safety filters — ensures correct project and status even if
+            # the API server-side filter doesn't honour the hex project_id param.
+            all_tasks = [
+                t for t in all_tasks
+                if t.get("projectId") == project_id
+                or t.get("project") == project_id
+                or t.get("project_id") == project_id
+            ]
+            if status is not None:
+                all_tasks = [t for t in all_tasks if t.get("status") == status]
+            return all_tasks
         else:
-             return []
+            return []
 

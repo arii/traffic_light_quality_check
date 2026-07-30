@@ -1,7 +1,6 @@
 import argparse
 import logging
 import sys
-from typing import List
 
 from .client import ScaleClient, normalize_task
 from .engine import audit_tasks

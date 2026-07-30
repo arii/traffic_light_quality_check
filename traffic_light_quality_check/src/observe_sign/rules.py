@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Set, Dict
+from typing import List, Dict
 
 from .models import Task, Finding, Annotation
 from . import geometry

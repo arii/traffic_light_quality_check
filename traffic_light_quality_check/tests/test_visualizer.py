@@ -10,6 +10,7 @@ def test_html_report_generation():
         {
             "task_id": "test_task_1",
             "project": "ObserveSign",
+            "status": "completed",
             "params": {
                 "attachment": "https://example.com/image.png",
                 "image_width": 1000,

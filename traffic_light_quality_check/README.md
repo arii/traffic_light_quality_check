@@ -52,6 +52,8 @@ PYTHONPATH=src python3 -m observe_sign \
 - **Audit JSON:** [results/audit.json](results/audit.json)
 - **Interactive Visualizer Report:** [results/report_output.html](results/report_output.html) — open in a browser to inspect bounding boxes, findings, and task annotations side-by-side.
 
+> **Note:** The committed results in `results/` were generated for project ID `5f124e5671c7b700170a16fb` (the 8 assigned Traffic Sign Detection tasks). To run against a different project, pass `--project-id <id>` and specify new output paths.
+
 ---
 
 ### 1. Approach
@@ -102,7 +104,16 @@ To verify the software's efficiency on standard consumer hardware, benchmarks we
 | **OVL-001** | Overlap | Duplicate Annotations | `error` | `extraneous` | Severe error if overlapping boxes have IoU > 0.90 (duplicate labels). |
 | **OVL-002** | Overlap | Suspicious Containment | `flag` | `position` | Warning flag if one bounding box is fully nested inside another. |
 
-### 7. Scoped Audit Results (8 Assigned Tasks)
+### 7. Scoped Audit Results (Project `5f124e5671c7b700170a16fb` — 8 Assigned Tasks)
+
+The results below correspond to the 8 tasks in the assigned Traffic Sign Detection project (`5f124e5671c7b700170a16fb`). The committed files in `results/` were produced by running:
+
+```bash
+PYTHONPATH=src python3 -m observe_sign \
+  --project-id 5f124e5671c7b700170a16fb \
+  --output results/audit.json \
+  --html results/report_output.html
+```
 
 ```
 Audit complete. Found 28 issues across 8 tasks.

@@ -9,7 +9,12 @@ def test_get_image_size_success():
     mock_img = MagicMock()
     mock_img.size = (1920, 1080)
 
-    with patch("urllib.request.urlopen") as mock_urlopen, \
+    mock_response = MagicMock()
+    mock_response.read.return_value = b"\xff\xd8\xff" + b"\x00" * 100  # fake JPEG-like bytes
+    mock_response.__enter__ = lambda s: s
+    mock_response.__exit__ = MagicMock(return_value=False)
+
+    with patch("urllib.request.urlopen", return_value=mock_response) as mock_urlopen, \
          patch("PIL.Image.open") as mock_open:
         mock_open.return_value.__enter__.return_value = mock_img
 
