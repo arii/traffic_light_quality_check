@@ -16,6 +16,7 @@ def main():
     parser.add_argument("--output", type=str, required=True, help="Path to output file (JSON or CSV)")
     parser.add_argument("--html", type=str, help="Path to generate interactive HTML visualization report")
     parser.add_argument("--save-tasks", type=str, metavar="PATH", help="Save fetched raw tasks to a JSON file for offline reuse with --file")
+    parser.add_argument("--status", type=str, default="completed", help="Only include tasks with this status (default: completed). Use 'all' to disable filtering.")
 
     args = parser.parse_args()
 
@@ -23,8 +24,9 @@ def main():
         logging.error("Error: Must provide either --project-id or --file")
         sys.exit(1)
 
+    status_filter = None if args.status == "all" else args.status
     client = ScaleClient()
-    raw_tasks = client.get_tasks(project_id=args.project_id, file_path=args.file)
+    raw_tasks = client.get_tasks(project_id=args.project_id, file_path=args.file, status=status_filter)
 
     if not raw_tasks:
         logging.info("No tasks found.")

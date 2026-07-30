@@ -26,7 +26,7 @@ This is only required when running against the live Scale API (i.e. without `--f
 **From the Scale API** (primary — requires `SCALE_API_KEY` in `.env`):
 ```bash
 PYTHONPATH=src python3 -m observe_sign \
-  --project-id 5f124e5671c7b700170a16fb \
+  --project-id <your-project-id> \
   --output results/audit.json \
   --html results/report_output.html
 ```
@@ -34,7 +34,7 @@ PYTHONPATH=src python3 -m observe_sign \
 **Save a local snapshot for offline reuse** (add `--save-tasks`):
 ```bash
 PYTHONPATH=src python3 -m observe_sign \
-  --project-id 5f124e5671c7b700170a16fb \
+  --project-id <your-project-id> \
   --output results/audit.json \
   --save-tasks tasks_snapshot.json
 ```
@@ -43,9 +43,9 @@ PYTHONPATH=src python3 -m observe_sign \
 ```bash
 PYTHONPATH=src python3 -m observe_sign \
   --file tasks_snapshot.json \
+  --project-id <your-project-id> \
   --output results/audit.json \
-  --html results/report_output.html \
-  --project-id 5f124e5671c7b700170a16fb
+  --html results/report_output.html
 ```
 
 ### Output
@@ -56,7 +56,7 @@ PYTHONPATH=src python3 -m observe_sign \
 
 ### 1. Approach
 - **Visual Problem Exploration:** I started with a web-based visualizer tool to overlay annotations directly onto S3 images. This helped map constraints visually and identify that the database dump contained a mixture of legacy traffic light tasks, retail/invoice linter data, and current target traffic sign tasks.
-- **Scoping Safeguard:** Parameterizing the CLI with `--project-id 5f124e5671c7b700170a16fb` isolates the checker to only validate the 8 target *Traffic Sign Detection* tasks, preventing legacy project schemas from contaminating the results.
+- **Scoping Safeguard:** Parameterizing the CLI with `--project-id` isolates the checker to only validate the target *Traffic Sign Detection* tasks, preventing legacy project schemas from contaminating the results.
 - **Agentic Orchestration:** I drafted a comprehensive task-specification layout (`plan.md`) to guide the module boundaries and system architecture, then directed autonomous agent coding tools to implement the helper files and checker modules under my direct supervision.
 - **Verification Loop:** Verifying check outputs inside the visualizer exposed key anomalies, such as undetected false-positive empty bounding boxes in night-time images (e.g. task `5f127f699740b80017f9b170`).
 
