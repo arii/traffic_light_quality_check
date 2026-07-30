@@ -1,3 +1,0 @@
-recursive-include dev_tools/dist *
-recursive-include dev_tools/resources *
-include dev_tools/cli-schema.json
