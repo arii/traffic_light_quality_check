@@ -16,16 +16,18 @@ def main():
 
     args = parser.parse_args()
 
+    if args.project_id and not args.project_id.isalnum():
+        raise ValueError("Invalid --project-id format: must be alphanumeric.")
+
     if not args.project_id and not args.file:
-        logging.error("Error: Must provide either --project-id or --file")
-        sys.exit(1)
+        raise ValueError("Error: Must provide either --project-id or --file")
 
     client = ScaleClient()
     raw_tasks = client.get_tasks(project_id=args.project_id, file_path=args.file)
 
     if not raw_tasks:
         logging.info("No tasks found.")
-        sys.exit(1)
+        return
 
     tasks = (normalize_task(t) for t in raw_tasks)
 
@@ -77,8 +79,12 @@ def main():
                     f.write(report_content)
 
                 logging.info(f"Visualization report generated at {args.html}")
-            except Exception as e:
+            except (IOError, OSError) as e:
                 logging.exception(f"Error generating HTML report: {e}")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except ValueError as e:
+        logging.error(str(e))
+        sys.exit(1)

@@ -547,7 +547,7 @@
       document.getElementById('image-status-bar').textContent = `Task ID: ${taskId} | Project: ${task.project || 'ObserveSign Sign detection'}`;
 
       loadedImage = new Image();
-      loadedImage.crossOrigin = 'anonymous';
+
       loadedImage.src = imgUrl;
 
       loadedImage.onload = () => {
