@@ -1,4 +1,7 @@
 # ObserveSign Quality Check
+
+> Development is inactive. This repository preserves the ObserveSign take-home assignment, including its reflection, tests and sample report. For newer work, see [Ariel Anders' portfolio](https://arii.github.io/).
+
 **Ariel Anders** | Takehome Assignment
 
 See [REFLECTION.md](REFLECTION.md) for approach, quality checks, per-task results, and future work.
